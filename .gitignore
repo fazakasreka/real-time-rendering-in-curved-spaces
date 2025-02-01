@@ -1,32 +1,47 @@
-# Prerequisites
-*.d
+# Build directories
+build/
+out/
+Debug/
+Release/
+x64/
 
-# Compiled Object files
-*.slo
-*.lo
-*.o
-*.obj
+# CMake generated files
+CMakeCache.txt
+CMakeFiles/
+cmake_install.cmake
+*.cmake
+!CMakeLists.txt
 
-# Precompiled Headers
-*.gch
-*.pch
+# IDE specific files
+.vs/
+.vscode/
+*.sln
+*.vcxproj
+*.vcxproj.filters
+*.vcxproj.user
+.idea/
 
-# Compiled Dynamic libraries
+# Compiled files
+*.exe
+*.dll
 *.so
 *.dylib
-*.dll
-
-# Fortran module files
-*.mod
-*.smod
-
-# Compiled Static libraries
-*.lai
-*.la
-*.a
 *.lib
+*.a
+*.obj
+*.o
 
-# Executables
-*.exe
-*.out
-*.app
+# OS specific files
+.DS_Store
+Thumbs.db
+
+# GLFW specific
+external/glfw/docs/
+external/glfw/tests/
+external/glfw/examples/
+external/glfw/build/
+external/glfw/CMakeFiles/
+external/glfw/CMakeCache.txt
+external/glfw/cmake_install.cmake
+external/glfw/cmake_uninstall.cmake
+external/glfw/Makefile
