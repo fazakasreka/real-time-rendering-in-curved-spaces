@@ -11,10 +11,15 @@ add_subdirectory(external/glfw)
 
 add_executable(${PROJECT_NAME} 
     src/main.cpp
+    src/framework/globalConstants.cpp
+    src/framework/gpuProgram.cpp
+    src/framework/texture.cpp
     external/glad/src/glad.c
 )
 
 target_include_directories(${PROJECT_NAME} PRIVATE
+    src
+    src/framework
     external/glad/include
     external/glfw/include
 )
