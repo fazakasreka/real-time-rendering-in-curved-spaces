@@ -35,6 +35,9 @@ cmake_install.cmake
 .DS_Store
 Thumbs.db
 
+#external
+external/Makefile
+
 # GLFW specific
 external/glfw/docs/
 external/glfw/tests/
@@ -46,8 +49,3 @@ external/glfw/cmake_install.cmake
 external/glfw/cmake_uninstall.cmake
 external/glfw/Makefile
 external/glfw/**/Makefile
-external/glfw/**/*.a
-external/glfw/**/*.so
-external/glfw/**/*.dylib
-external/glfw/**/*.dll
-external/glfw/**/*.lib
