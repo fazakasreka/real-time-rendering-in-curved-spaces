@@ -45,3 +45,9 @@ external/glfw/CMakeCache.txt
 external/glfw/cmake_install.cmake
 external/glfw/cmake_uninstall.cmake
 external/glfw/Makefile
+external/glfw/**/Makefile
+external/glfw/**/*.a
+external/glfw/**/*.so
+external/glfw/**/*.dylib
+external/glfw/**/*.dll
+external/glfw/**/*.lib
