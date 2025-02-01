@@ -6,30 +6,29 @@ Based on the paper [Adapting Game Engines to Curved Spaces](https://link.springe
 
 # How to run
 
-0. Install CMake (if you don't have it already)
+### 0. Install CMake (if you don't have it already)
     - Windows: ```winget install Kitware.CMake```
     - Linux: ```sudo apt install cmake```
     - macOS: ```brew install cmake```
-1. Install submodules (glfw)
+### 1. Install submodules (glfw)
     ```
     git submodule update --init --recursive
     ```
-2. Run CMake
+### 2. Run CMake
     ```
     mkdir build
     cmake -B build -S . #run when you first make the project or make changes to the CMakeLists.txt
     cmake --build build #run when you make changes to the code
     ```
-3. Run the executable
+### 3. Run the executable
     ```
     ./build/non-euclidean-space
     ```
 
 
 # Common issues and solutions:
-1. If CMake can't find OpenGL:
-    On macOS, it should be included with Xcode
-    On Windows, it should be included with Visual Studio
+### 1. CMake can't find OpenGL:
+*On macOSOpenGL should be included with Xcode. On Windows with Visual Studio*
     - On Ubuntu/Debian:
         ```
         sudo apt install libgl1-mesa-dev
@@ -46,7 +45,7 @@ Based on the paper [Adapting Game Engines to Curved Spaces](https://link.springe
             ```
             xcode-select --install
             ```
-2. MacOS can't find c++ libraries:
+### 2. MacOS can't find c++ libraries:
     - Make sure you have Xcode Command Line Tools:
         ```
         xcode-select --install
