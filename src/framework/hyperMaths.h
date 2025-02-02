@@ -141,7 +141,7 @@ inline float det(const mat3& m) {
 		m[0][2] * (m[1][0] * m[2][1] - m[1][1] * m[2][0]);
 }
 
-inline vec4 cross(const vec4& t, const vec4& a, const vec4& b) {
+inline vec4 smartCross(const vec4& t, const vec4& a, const vec4& b) {
 	float alph = curvature;
 	mat3 mx(t.y, t.z, alph * t.w,
 		a.y, a.z, alph * a.w,

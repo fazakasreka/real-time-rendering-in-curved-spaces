@@ -1,11 +1,14 @@
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
 #include <iostream>
-#include "framework/hyperMaths.h"
 #include "graphics.cpp"
 
-Direction cameraDirection = NONE;
 Scene scene;
+
+Direction cameraDirection = NONE;
+double mouseDeltaX = 0.0;
+double mouseDeltaY = 0.0;
+bool leftMousePressed = false;
 
 // Error callback for GLFW
 void errorCallback(int error, const char* description) {
@@ -36,6 +39,34 @@ void processInput(GLFWwindow* window) {
         cameraDirection = DOWN;
     else
         cameraDirection = NONE;
+}
+
+void mouseButtonCallback(GLFWwindow* window, int button, int action, int mods) {
+    if (button == GLFW_MOUSE_BUTTON_LEFT) {
+        if (action == GLFW_PRESS) {
+            leftMousePressed = true;
+        }
+        else if (action == GLFW_RELEASE) {
+            leftMousePressed = false;
+        }
+    }
+}
+
+// Mouse callback function
+double mouseX = 0.0;
+double mouseY = 0.0;
+void mouseCallback(GLFWwindow* window, double xpos, double ypos) {
+    if (leftMousePressed) {
+        float newMouseX = (xpos / windowWidth * 2.0) - 1.0;
+        float newMouseY = 1.0 - (ypos /windowHeight * 2.0);
+        mouseDeltaX = newMouseX - mouseX;
+        mouseDeltaY = newMouseY - mouseY;
+        mouseX = newMouseX;
+        mouseY = newMouseY;
+    }else{
+        mouseDeltaX = 0.0;
+        mouseDeltaY = 0.0;
+    }
 }
 
 int main() {
@@ -72,6 +103,8 @@ int main() {
     // Set viewport and callbacks
     glViewport(0, 0, windowWidth, windowHeight);
     glfwSetFramebufferSizeCallback(window, framebufferSizeCallback);
+    glfwSetCursorPosCallback(window, mouseCallback);
+    glfwSetMouseButtonCallback(window, mouseButtonCallback);
 
     // Initialize OpenGL state
     glEnable(GL_DEPTH_TEST);
@@ -102,6 +135,7 @@ int main() {
         for (float t = tstart; t < tend; t += dt) {
             float Dt = fmin(dt, tend - t);
             scene.Animate(t, t + Dt);
+            scene.camera.pan(mouseDeltaX, mouseDeltaY);
             scene.camera.move(Dt, cameraDirection);
         }
 

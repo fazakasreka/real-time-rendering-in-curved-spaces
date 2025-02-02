@@ -1,9 +1,5 @@
 #include <iostream>
-#include "framework/hyperMaths.h"
-#include "framework/texture.h"
-#include "framework/gpuProgram.h"
-
-
+#include "framework.h"
 
 const int tessellationLevel = 20;
 float wMirror = 1;
@@ -22,7 +18,7 @@ enum Direction
 struct Camera { 
 	vec4 position = vec4(0, 0, 0.0, 1.0f);
 	vec4 velocity = vec4(0, 0, 0, 0);
-	vec4 front = vec4(0, 0, -1, 0);
+	vec4 lookAt = vec4(0, 0, -1, 0);
 	vec4 up =	 vec4(0, 1, 0, 0);
 
 	float fov, asp, fp, bp;	
@@ -40,51 +36,56 @@ public:
 			bp = 30.f;
 	}
 
+	void pan(float deltaX, float deltaY){ //x and y are in the range of -1 to 1
+		vec3 lookAt3 = vec3(lookAt.x, lookAt.y, lookAt.z);
+		vec3 up3 = vec3(up.x, up.y, up.z);
+		vec3 right = cross(lookAt3, up3);
+
+		lookAt3 = normalize(lookAt3 + deltaX * right + deltaY * up3);
+
+		lookAt = vec4(lookAt3.x, lookAt3.y, lookAt3.z, 0);
+	}
+
+
+
 	void move(float dt, Direction move_direction){
-		if (curvature == EUC) {
+
 			vec4 direction = vec4(0, 0, 0, 0);
+			if (move_direction == LEFT){
+				vec3 left = cross(vec3(up.x, up.y, up.z), vec3(lookAt.x, lookAt.y, lookAt.z));
+				direction = vec4(left.x, left.y, left.z, 0);
+			}  
+			else if (move_direction == RIGHT){
+				vec3 right = cross(vec3(lookAt.x, lookAt.y, lookAt.z), vec3(up.x, up.y, up.z));
+				direction = vec4(right.x, right.y, right.z, 0);
+			}
+			else if (move_direction == UP)    direction = vec4(0, 1, 0, 0);
+			else if (move_direction == DOWN)  direction = vec4(0, -1, 0, 0);
+			else if (move_direction == FORWARD)  direction = lookAt;
+			else if (move_direction == BACKWARD)  direction = -lookAt;
+			
+			if (curvature == EUC) {
+				position = position + direction * dt *1.0f;
+				return;
+			}
 
-			if (move_direction == LEFT)  direction = vec4(-1, 0, 0, 0);
-			else if (move_direction == RIGHT) direction = vec4(1, 0, 0, 0);
-			else if (move_direction == UP)    direction = vec4(0, 0, -1, 0);
-			else if (move_direction == DOWN)  direction = vec4(0, 0, 1, 0);
-			else if (move_direction == FORWARD)  direction = vec4(0, 1, 0, 0);
-			else if (move_direction == BACKWARD)  direction = vec4(0, -1, 0, 0);
-
-
-			position = position + direction * dt *1.0f;		
-		}
-		else {
-			vec4 direction = vec4(0, 0, 0, 0);
-
-			if (move_direction == LEFT)  direction = transformVectorToCurrentSpace(-1, 0, 0, position);
-			else if (move_direction == RIGHT) direction = transformVectorToCurrentSpace(1, 0, 0, position);
-			else if (move_direction == UP)    direction = transformVectorToCurrentSpace(0, 0, -1, position);
-			else if (move_direction == BACKWARD)  direction = transformVectorToCurrentSpace(0, 0, 1, position);
-			else if (move_direction == FORWARD)  direction = transformVectorToCurrentSpace(0, 1, 0, position);
-			else if (move_direction == BACKWARD)  direction = transformVectorToCurrentSpace(0, -1, 0, position);
-
+			direction = transformVectorToCurrentSpace(direction, position);
 
 			if (!(direction.x == 0 && direction.y == 0 && direction.z == 0 && direction.w == 0)) {
 				position = position * smartCos(dt / 1.0f) + direction * smartSin(dt / 1.0f);
 			}
 
-			if (curvature == SPH && position.w < 0.0f) {
+			if (curvature == SPH && position.w < 0.0f) { //we walked around int the spherical world
 				position = -position;
 				up = -up;
 			} 
-
-		
-		}
-		
 	}
 
 	mat4 V() { // view matrix: translates the center to the origin
 		if (curvature == EUC) {
-			vec3 lookAt = vec3(0, 0, -1);
 			vec3 wVup = vec3(0, 1, 0);
 
-			vec3 k_ = normalize(-lookAt);
+			vec3 k_ = normalize(vec3(-lookAt.x, -lookAt.y, -lookAt.z));
 			vec3 i_ = normalize(cross(wVup, k_));
 			vec3 j_ = normalize(cross(k_, i_));
 
@@ -95,14 +96,15 @@ public:
 		
 		}
 		else {
-			vec4 lookAt = transformVectorToCurrentSpace(front, position);
+			vec4 lookAtTransformed = transformVectorToCurrentSpace(lookAt, position);
 			vec4 wVup = transformVectorToCurrentSpace(up, position);
+
 
 			float alpha = curvature;
 
-			vec4 k_ = normalize(-lookAt);
-			vec4 i_ = normalize(cross(position, wVup, k_)) * alpha;
-			vec4 j_ = normalize(cross(position, k_, i_)) * alpha;
+			vec4 k_ = normalize(-lookAtTransformed);
+			vec4 i_ = normalize(smartCross(position, wVup, k_)) * alpha;
+			vec4 j_ = normalize(smartCross(position, k_, i_)) * alpha;
 
 			return mat4(i_.x, j_.x, k_.x, alpha * position.x,
 				i_.y, j_.y, k_.y, alpha * position.y,
@@ -116,16 +118,12 @@ public:
 		float A, B;
 
 		if (curvature == EUC) {
-
 			A = -(fp + bp) / (bp - fp);
 			B = -2 *fp*bp / (bp - fp);
-		
 		}
 		else {
-
 			A = -smartSin(fp + bp) / smartSin(bp - fp);
 			B = -2 * smartSin(fp)*smartSin(bp) / smartSin(bp - fp);
-
 		}
 
 		return mat4(1 / (tan(fov / 2)*asp), 0, 0, 0,
@@ -138,65 +136,7 @@ public:
 	
 };
 
-struct Material {
-	vec3 kd, ks, ka;
-	float shininess, emission;
 
-	Material() { ka = vec3(1, 1, 1), kd = ks = vec3(0, 0, 0); shininess = 1; emission = 0; }
-};
-
-struct Light {
-	vec3 La, Le;
-	vec4 wLightPos; // homogeneous coordinates, can be at ideal point
-};
-
-class CheckerBoardTexture : public Texture {
-public:
-	CheckerBoardTexture(const int width, const int height) : Texture() {
-		std::vector<vec4> image(width * height);
-		const vec4 yellow(1, 1, 0, 1), blue(0, 0, 1, 1);
-		for (int x = 0; x < width; x++) for (int y = 0; y < height; y++) {
-			image[y * width + x] = (x & 1) ^ (y & 1) ? yellow : blue;
-		}
-		create(width, height, image, GL_NEAREST);
-	}
-};
-
-struct RenderState {
-	mat4	           MVP, M, Minv, V, P;
-	Material *         material;
-	std::vector<Light> lights;
-	Texture *          texture;
-	vec4	           wEye;
-};
-
-class Shader : public GPUProgram {
-public:
-	virtual void Bind(RenderState state) = 0;
-
-	void setUniformMaterial(const Material& material, const std::string& name) {
-		setUniform(material.kd, name + ".kd");
-		setUniform(material.ks, name + ".ks");
-		setUniform(material.ka, name + ".ka");
-		setUniform(material.shininess, name + ".shininess");
-	}
-
-	void setUniformLight(const Light& light, const std::string& name) {
-		setUniform(light.La, name + ".La");
-		setUniform(light.Le, name + ".Le");
-		setUniform(light.wLightPos, name + ".wLightPos");
-	}
-
-	void setUniformMaterial(const Material * material, const std::string& name) {
-		static Material defaultMaterial;
-		const Material * currentMaterial = (material == NULL) ? &defaultMaterial : material;
-		setUniform(currentMaterial->kd, name + ".kd");
-		setUniform(currentMaterial->ks, name + ".ks");
-		setUniform(currentMaterial->ka, name + ".ka");
-		setUniform(currentMaterial->shininess, name + ".shininess");
-		setUniform(currentMaterial->emission, name + ".emission");
-	}
-};
 
 //---------------------------
 class PhongShader : public Shader {
@@ -647,6 +587,17 @@ public:
 	}
 };
 
+class CheckerBoardTexture : public Texture {
+public:
+	CheckerBoardTexture(const int width, const int height) : Texture() {
+		std::vector<vec4> image(width * height);
+		const vec4 yellow(1, 1, 0, 1), blue(0, 0, 1, 1);
+		for (int x = 0; x < width; x++) for (int y = 0; y < height; y++) {
+			image[y * width + x] = (x & 1) ^ (y & 1) ? yellow : blue;
+		}
+		create(width, height, image, GL_NEAREST);
+	}
+};
 
 class Geometry {
 protected:
@@ -691,7 +642,7 @@ public:
 		eval(U, V, X, Y, Z);
 		vtxData.position = vec4(X.f, Y.f, Z.f, 1.0f);
 		vec4 drdU(X.d.x, Y.d.x, Z.d.x, 0.0f), drdV(X.d.y, Y.d.y, Z.d.y, 0.0f);
-		vtxData.normal = cross(vec4(0.0f, 0.0f, 0.0f, 1.0f),drdU, drdV);
+		vtxData.normal = smartCross(vec4(0.0f, 0.0f, 0.0f, 1.0f),drdU, drdV);
 		return vtxData;
 	}
 

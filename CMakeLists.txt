@@ -14,6 +14,7 @@ add_executable(${PROJECT_NAME}
     src/framework/globalConstants.cpp
     src/framework/gpuProgram.cpp
     src/framework/texture.cpp
+    src/framework/shader.cpp
     external/glad/src/glad.c
 )
 
