@@ -39,6 +39,14 @@ void processInput(GLFWwindow* window) {
         cameraDirection = DOWN;
     else
         cameraDirection = NONE;
+
+    // Change curvature
+    if (glfwGetKey(window, GLFW_KEY_1) == GLFW_PRESS)
+        changeCurvature(HYP);
+    else if (glfwGetKey(window, GLFW_KEY_2) == GLFW_PRESS)
+        changeCurvature(SPH);
+    else if (glfwGetKey(window, GLFW_KEY_3) == GLFW_PRESS)
+        changeCurvature(EUC);
 }
 
 void mouseButtonCallback(GLFWwindow* window, int button, int action, int mods) {

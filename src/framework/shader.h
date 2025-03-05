@@ -30,6 +30,7 @@ public:
     void setUniformMaterial(const Material &material, const std::string &name);
     void setUniformLight(const Light &light, const std::string &name);
     void setUniformMaterial(const Material *material, const std::string &name);
+    void createShaderFromFiles(const char* vertPath, const char* fragPath, const char* outputName);
 };
 
 #endif // SHADER_H
