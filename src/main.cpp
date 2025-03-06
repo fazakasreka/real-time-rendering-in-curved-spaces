@@ -42,11 +42,11 @@ void processInput(GLFWwindow* window) {
 
     // Change curvature
     if (glfwGetKey(window, GLFW_KEY_1) == GLFW_PRESS)
-        changeCurvature(HYP);
+        setCurvature(HYP);
     else if (glfwGetKey(window, GLFW_KEY_2) == GLFW_PRESS)
-        changeCurvature(SPH);
+        setCurvature(EUC);
     else if (glfwGetKey(window, GLFW_KEY_3) == GLFW_PRESS)
-        changeCurvature(EUC);
+        setCurvature(SPH);
 }
 
 void mouseButtonCallback(GLFWwindow* window, int button, int action, int mods) {

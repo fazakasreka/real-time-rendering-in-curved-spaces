@@ -16,7 +16,7 @@ struct Light {
 };
 
 struct RenderState {
-	mat4	           MVP, M, Minv, V, P;
+	mat4	           MVP, Scale, Rotate, Translate, Minv, V, P;
 	Material *         material;
 	std::vector<Light> lights;
 	Texture *          texture;

@@ -4,6 +4,6 @@ float curvature = HYP;
 int windowWidth = 800;
 int windowHeight = 600;
 
-void changeCurvature(int newCurvature) {
+void setCurvature(int newCurvature) {
     curvature = newCurvature;
 }

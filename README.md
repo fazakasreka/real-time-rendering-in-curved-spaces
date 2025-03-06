@@ -28,6 +28,10 @@ Based on the paper [Adapting Game Engines to Curved Spaces](https://link.springe
 
     ./build/non-euclidean-space
 
+### 4. Build & run
+
+    cmake --build build && ./build/non-euclidean-space
+
 
 ## Common issues and solutions
 

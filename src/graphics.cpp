@@ -2,7 +2,6 @@
 #include "framework.h"
 
 const int tessellationLevel = 20;
-float wMirror = 1;
 
 enum Direction
 {
@@ -16,7 +15,7 @@ enum Direction
 };
 
 struct Camera { 
-	vec4 position = vec4(0, 0, 0.0, 1.0f);
+	vec4 eucPosition = vec4(0, 0, 0.0, 1.0f);
 	vec4 velocity = vec4(0, 0, 0, 0);
 	vec4 lookAt = vec4(0, 0, -1, 0);
 	vec4 up =	 vec4(0, 1, 0, 0);
@@ -26,9 +25,18 @@ struct Camera {
 public:
 	Camera() {
 		asp = (float)windowWidth / windowHeight;
-		fov = 90.0f * (float)M_PI / 180.0f;
-		fp = 0.1f;  // Near plane
-		bp = (curvature == SPH) ? 3.14f : 30.0f;  // Far plane different for spherical
+		fov = 60.0f * (float)M_PI / 180.0f;
+		fp = 0.01f;
+		
+		if (curvature == SPH) {
+			bp = M_PI;  // Maximum distance in spherical space is π
+		}
+		else if (curvature == HYP) {
+			bp = 30.0f;
+		}
+		else {
+			bp = 100.0f;
+		}
 	}
 
 	void pan(float deltaX, float deltaY){ //x and y are in the range of -1 to 1
@@ -58,21 +66,15 @@ public:
 			else if (move_direction == DOWN)  direction = vec4(0, -1, 0, 0);
 			else if (move_direction == FORWARD)  direction = lookAt;
 			else if (move_direction == BACKWARD)  direction = -lookAt;
-			
-			if (curvature == EUC) {
-				position = position + direction * dt *1.0f;
-				return;
-			}
 
-			direction = transformVectorToCurrentSpace(direction, position);
+			eucPosition = eucPosition + direction * dt * 1.0f;
 
-			if (!(direction.x == 0 && direction.y == 0 && direction.z == 0 && direction.w == 0)) {
-				position = position * smartCos(dt / 1.0f) + direction * smartSin(dt / 1.0f);
-			}
-
-			if (curvature == SPH && position.w < 0.0f) { //we walked around int the spherical world
-				position = -position;
-				up = -up;
+			if (curvature == SPH) { //we walked around int the spherical world
+				vec4 sphPosition = transformPointToCurrentSpace(eucPosition);
+				if(sphPosition.w < 0) {
+					eucPosition = -eucPosition;
+					up = -up;
+				}
 			} 
 	}
 
@@ -84,27 +86,29 @@ public:
 			vec3 i_ = normalize(cross(wVup, k_));
 			vec3 j_ = normalize(cross(k_, i_));
 
-			return TranslateMatrix(position * oppositeVector()) * mat4(i_.x, j_.x, k_.x, 0,
+			return TranslateMatrix(eucPosition * oppositeVector()) * mat4(i_.x, j_.x, k_.x, 0,
 				i_.y, j_.y, k_.y, 0,
 				i_.z, j_.z, k_.z, 0,
 				0, 0, 0, 1);
 		
 		}
 		else {
-			vec4 lookAtTransformed = transformVectorToCurrentSpace(lookAt, position);
-			vec4 wVup = transformVectorToCurrentSpace(up, position);
+			vec4 geomPosition = transformPointToCurrentSpace(eucPosition);
+
+			vec4 lookAtTransformed = transformVectorToCurrentSpace(lookAt, geomPosition);
+			vec4 wVup = transformVectorToCurrentSpace(up, geomPosition);
 
 
 			float alpha = curvature;
 
 			vec4 k_ = normalize(-lookAtTransformed);
-			vec4 i_ = normalize(smartCross(position, wVup, k_)) * alpha;
-			vec4 j_ = normalize(smartCross(position, k_, i_)) * alpha;
+			vec4 i_ = normalize(smartCross(geomPosition, wVup, k_)) * alpha;
+			vec4 j_ = normalize(smartCross(geomPosition, k_, i_)) * alpha;
 
-			return mat4(i_.x, j_.x, k_.x, alpha * position.x,
-				i_.y, j_.y, k_.y, alpha * position.y,
-				i_.z, j_.z, k_.z, alpha * position.z,
-				alpha * i_.w, alpha * j_.w, alpha * k_.w, position.w);
+			return mat4(i_.x, j_.x, k_.x, alpha * geomPosition.x,
+				i_.y, j_.y, k_.y, alpha * geomPosition.y,
+				i_.z, j_.z, k_.z, alpha * geomPosition.z,
+				alpha * i_.w, alpha * j_.w, alpha * k_.w, geomPosition.w);
 		}
 
 	}
@@ -141,24 +145,14 @@ public:
 		Use();      // make this program run
 		int sign = (curvature == HYP) ? -1 : 1;
 		setUniform(sign, "LorentzSign");
-		setUniform(wMirror, "wMirror");
 
-		mat4 RotateMatrix = state.M;
-		RotateMatrix[3][0] = RotateMatrix[3][1] = RotateMatrix[3][2] = 0;
-		setUniform(RotateMatrix, "RotateMatrix");
 
-		setUniform(vec4(state.M[3][0], state.M[3][1], state.M[3][2], 1), "eucTranslate");
+		setUniform(state.Scale, "ScaleMatrix");
+		setUniform(state.Rotate, "RotateMatrix");
+		setUniform(state.Translate, "TranslateMatrix");
+		setUniform(state.MVP, "MVPMatrix");
 
 		setUniform(state.wEye, "wEye");
-		setUniform(vec4(state.V[0][0], state.V[1][0], state.V[2][0], 0), "ic");
-		setUniform(vec4(state.V[0][1], state.V[1][1], state.V[2][1], 0), "jc");
-		setUniform(vec4(state.V[0][2], state.V[1][2], state.V[2][2], 0), "kc");
-
-		setUniform(state.P[0][0], "sFovX");
-		setUniform(state.P[1][1], "sFovY");
-		float alpha = state.P[2][2], beta = state.P[3][2];
-		setUniform(beta / (alpha - 1), "fp");
-		setUniform(beta / (alpha + 1), "bp");
 
 		setUniform(*state.texture, std::string("diffuseTexture"));
 		setUniformMaterial(state.material, "material");
@@ -288,19 +282,16 @@ private:
 
 
 public:
-	Plane(float _height = 0.0f, float _width = 2.0f * (float)M_PI, float _depth = 2.0f * (float)M_PI) { 
-		height = _height;
-		width = _width;
-		depth = _depth;
+	Plane() { 
 		create(); 
 	}
 
 	void eval(Dnum2& U, Dnum2& V, Dnum2& X, Dnum2& Y, Dnum2& Z) override {
-		U = U * width - width / 2.0f;
-		V = V * depth - depth / 2.0f;
+		U = U * 2.0f * (float)M_PI - 2.0f * (float)M_PI / 2.0f;
+		V = V * 2.0f * (float)M_PI - 2.0f * (float)M_PI / 2.0f;
 		
 		X = U;
-		Y = Dnum2(height);  // Constant height
+		Y = Dnum2(0.0f);  // Constant height
 		Z = V;
 	}
 };
@@ -314,33 +305,44 @@ struct Object {
 
 	vec4 translation;
 	vec3 rotationAxis;
+	vec3 scale;
 	float rotationAngle;
 
+	bool draw_in_spherical_space;
+
 public:
-	Object(Shader * _shader, Material * _material, Texture * _texture, Geometry * _geometry) :
-		translation(vec4(0, 0, 0, 1.0)), rotationAxis(0, 0, 1), rotationAngle(0) {
+	Object(
+		Shader * _shader, 
+		Material * _material,
+		Texture * _texture, 
+		Geometry * _geometry, 
+		bool _draw_in_spherical_space = true
+	) :
+		translation(vec4(0, 0, 0, 1.0)), rotationAxis(0, 0, 1), rotationAngle(0), scale(1, 1, 1), draw_in_spherical_space(_draw_in_spherical_space) {
 
 		shader = _shader;
 		texture = _texture;
 		material = _material;
 		geometry = _geometry;
+		draw_in_spherical_space = _draw_in_spherical_space;
 	}
 
-	virtual void SetModelingTransform(mat4& M, mat4& Minv) {
-		M = RotationMatrix(rotationAngle, rotationAxis) * TranslateMatrix(translation);
-		if (true) {
-			Minv = TranslateMatrix(translation * oppositeVector()) * RotationMatrix(-rotationAngle, rotationAxis);
-		} else {
-			Minv = TranslateMatrix(-translation) * RotationMatrix(-rotationAngle, rotationAxis);
-		}
+	virtual void SetModelingTransform(mat4& Scale, mat4& Rotate, mat4& Translate) {
+		Scale = ScaleMatrix(scale);
+		Rotate = RotationMatrix(rotationAngle, rotationAxis);
+		Translate = TranslateMatrix(translation);
 	}
 
 	void Draw(RenderState state) {
-		mat4 M, Minv;
-		SetModelingTransform(M, Minv);
-		state.M = M;
-		state.Minv = Minv;
-		state.MVP = state.M * state.V * state.P;
+		if(curvature == SPH && !draw_in_spherical_space) {
+			return;
+		}
+		mat4 Scale, Rotate, Translate;
+		SetModelingTransform(Scale, Rotate, Translate);
+		state.Scale = Scale;	
+		state.Rotate = Rotate;
+		state.Translate = Translate;
+		state.MVP = state.Translate * state.V * state.P;
 		state.material = material;
 		state.texture = texture;
 		shader->Bind(state);
@@ -360,82 +362,65 @@ public:
 		// Shaders
 		Shader * geomShader = new GeomShader();
 
-		// Materials
-		Material * material0 = new Material;
-		material0->kd = vec3(0.5f, 0.1f, 0.1f);
-		material0->ks = vec3(0.5, 0.1,  0.1);
-		material0->ka = vec3(0.5f, 0.1f, 0.1f);
-		material0->shininess = 100;
+		// Material
+		Material * material = new Material;
+		material->kd = vec3(0.5f, 0.1f, 0.1f);
+		material->ks = vec3(0.5, 0.1,  0.1);
+		material->ka = vec3(0.5f, 0.1f, 0.1f);
+		material->shininess = 100;
 
-		Material * mater1 = new Material;
-		mater1->kd = vec3(0.1f, 0.3f, 0.3f);
-		mater1->ks = vec3(0.1f, 0.3f, 0.3f);
-		mater1->ka = vec3(0.1f, 0.3f, 0.3f);
-		mater1->shininess = 30;
-
-		Material * mater2 = new Material;
-		mater2->kd = vec3(0.3f, 0.1f, 0.3f);
-		mater2->ks = vec3(0.3f, 0.1f, 0.3f);
-		mater2->ka = vec3(0.3f, 0.1f, 0.3f);
-		mater2->shininess = 30;
-
-		Material * mater3 = new Material;
-		mater3->kd = vec3(0.3f, 0.3f, 0.5f);
-		mater3->ks = vec3(0.3f, 0.3f, 0.5f);
-		mater3->ka = vec3(0.3f, 0.3f, 0.5f);
-		mater3->shininess = 30;
-
-		std::vector<Material*> materials;
-		materials.push_back(mater1);
-		materials.push_back(mater2);
-		materials.push_back(mater3);
-
-		// Scene parameters
-		float gridSize = 1.57f;  // π/2 for consistent spacing
-		int N = 1;              // grid size (half-width)
-		int Ny = 3;            // number of vertical levels (half-height)
 
 		// Textures
-		Texture * texture4x8 = new CheckerBoardTexture(4, 8);
-		Texture * texturePlane = new CheckerBoardTexture(40, 40);
+		Texture * texture4x4 = new CheckerBoardTexture(4, 4);
+		Texture * texture40x40 = new CheckerBoardTexture(40, 40);
 
 		// Geometries
 		Sphere * sphere_geom = new Sphere();
-		Plane * plane_geom = new Plane(
-			0.0f, 
-			SPH ? 2.0f * (float)M_PI : 30.0f, 
-			SPH ? 2.0f * (float)M_PI : 30.0f);
+		Plane * plane_geom = new Plane();
 		
-		// Create horizontal planes at different heights
-		for (int y = -Ny; y <= Ny; y++) {
-			int mat = y + Ny < materials.size() ? y + Ny : 0;
+		// Planes grid
+		for (int y = -3; y <= 3; y++) {
 			
-			// Create horizontal plane
-			Object * plane_obj = new Object(geomShader, materials[mat], texturePlane, plane_geom);
+			// horizontal plane
+			Object * plane_obj = new Object(
+				geomShader, 
+				material, 
+				texture40x40, 
+				plane_geom, 
+				y==0 //draw in spherical space
+			);
 			float height = y * 1.0f;  // Use consistent spacing
 			plane_obj->translation = vec4(0.0f, height, 0.0f, 1.0f);
+			plane_obj->scale = vec3(10.0f, 10.0f, 10.0f);
+
 			objects.push_back(plane_obj);
 
-			// Create vertical plane (except for spherical geometry)
-			if (curvature != SPH) {
-				Object * planeV = new Object(geomShader, materials[mat], texturePlane, plane_geom);
-				planeV->rotationAxis = vec3(0, 0, 1);
-				planeV->rotationAngle = M_PI / 2.0f;  // 90 degrees
-				planeV->translation = vec4(height, 0.0f, 0.0f, 1.0f);
-				objects.push_back(planeV);
-			}
+			//vertical plane
+			Object * vertical_plane_obj = new Object(
+				geomShader, 
+				material, 
+				texture40x40,
+				plane_geom, 
+				false //draw in spherical space
+			);
+			vertical_plane_obj->rotationAxis = vec3(0, 0, 1);
+			vertical_plane_obj->rotationAngle = M_PI / 2.0f;
+			vertical_plane_obj->translation = vec4(height, 0.0f, 0.0f, 1.0f);
+			vertical_plane_obj->scale = vec3(10.0f, 10.0f, 10.0f);
+			objects.push_back(vertical_plane_obj);
+		
 		}
 		
-		// Create grid of spheres
-		for (int i = -N; i <= N; i++) {
-			for (int j = -N; j <= N; j++) {
-				Object * sphere_obj = new Object(geomShader, material0, texture4x8, sphere_geom);
-				sphere_obj->translation = vec4(i * gridSize, 0.0f, j * gridSize, 1.0f);
+		// Grid of spheres
+		for (int i = -1; i <= 1; i++) {
+			for (int j = -1; j <= 1; j++) {
+				Object * sphere_obj = new Object(geomShader, material, texture4x4, sphere_geom);
+				sphere_obj->translation = vec4(i * 1.57f, 0.0f, j * 1.57f, 1.0f);
 				objects.push_back(sphere_obj);
 			}
 		}
 
-		// Create lights in Euclidean coordinates
+		//Lights
 		Light light;
 		light.La = vec3(1.5f, 1.5f, 1.5f);
 		light.Le = vec3(3.0f, 3.0f, 3.0f);
@@ -457,18 +442,13 @@ public:
 
 	void Render() {
 		RenderState state;
-		state.wEye = camera.position;
+		state.wEye = camera.eucPosition;
 		state.V = camera.V();
 		state.P = camera.P();
 		state.lights = lights;
 		for (auto * obj : objects) {
 			if (dynamic_cast<GeomShader*>(obj->shader)) {
-				wMirror = 1;
 				obj->Draw(state);
-				if (curvature == SPH) {
-					wMirror = -1;
-					obj->Draw(state);
-				}
 			}
 		}
 	}
