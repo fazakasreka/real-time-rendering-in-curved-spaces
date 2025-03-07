@@ -292,32 +292,38 @@ struct Object {
 	Texture *  texture;
 	Geometry * geometry;
 
-	vec4 translation;
-	vec3 rotationAxis;
-	vec3 scale;
-	float rotationAngle;
+	vec4 translation = vec4(0, 0, 0, 0);
+	vec3 rotationAxis = vec3(0, 0, 1);
+	vec3 scale = vec3(1, 1, 1);
+	vec3 sph_scale = vec3(1, 1, 1);
+	float rotationAngle = 0;
 
-	bool draw_in_spherical_space;
+	bool draw_in_spherical_space = true;
 
 public:
 	Object(
 		Shader * _shader, 
 		Material * _material,
 		Texture * _texture, 
-		Geometry * _geometry, 
-		bool _draw_in_spherical_space = true
+		Geometry * _geometry
 	) :
-		translation(vec4(0, 0, 0, 1.0)), rotationAxis(0, 0, 1), rotationAngle(0), scale(1, 1, 1), draw_in_spherical_space(_draw_in_spherical_space) {
+		translation(vec4(0, 0, 0, 1.0)), 
+		rotationAxis(0, 0, 1), 
+		rotationAngle(0), 
+		scale(1, 1, 1) {
 
 		shader = _shader;
 		texture = _texture;
 		material = _material;
 		geometry = _geometry;
-		draw_in_spherical_space = _draw_in_spherical_space;
 	}
 
 	virtual void SetModelingTransform(mat4& Scale, mat4& Rotate, mat4& Translate) {
-		Scale = ScaleMatrix(scale);
+		if(curvature == SPH){
+			Scale = ScaleMatrix(sph_scale);
+		}else{
+			Scale = ScaleMatrix(scale);
+		}
 		Rotate = RotationMatrix(rotationAngle, rotationAxis);
 		Translate = TranslateMatrix(translation);
 	}
@@ -375,12 +381,14 @@ public:
 				geomShader, 
 				material, 
 				texture40x40, 
-				plane_geom, 
-				y==0 //draw in spherical space
+				plane_geom
 			);
 			float height = y * 1.0f - 0.5f;  // Use consistent spacing
 			plane_obj->translation = vec4(0.0f, height, 0.0f, 1.0f);
-			plane_obj->scale = vec3(3.14f, 3.14f, 3.14f);
+			plane_obj->scale = vec3(5.0f, 5.0f, 5.0f);
+
+			plane_obj->draw_in_spherical_space = y == 0;
+			plane_obj->sph_scale = vec3(3.14f, 3.14f, 3.14f);
 
 			objects.push_back(plane_obj);
 
@@ -389,13 +397,13 @@ public:
 				geomShader, 
 				material, 
 				texture40x40,
-				plane_geom, 
-				false //draw in spherical space
+				plane_geom
 			);
 			vertical_plane_obj->rotationAxis = vec3(0, 0, 1);
 			vertical_plane_obj->rotationAngle = M_PI / 2.0f;
 			vertical_plane_obj->translation = vec4(height, 0.0f, 0.0f, 1.0f);
-			vertical_plane_obj->scale = vec3(2.0f, 2.0f, 2.0f);
+			vertical_plane_obj->scale = vec3(5.0f, 5.0f, 5.0f);
+			vertical_plane_obj->draw_in_spherical_space = false;
 			objects.push_back(vertical_plane_obj);
 		
 		}
@@ -406,6 +414,7 @@ public:
 				Object * sphere_obj = new Object(geomShader, material, texture4x4, sphere_geom);
 				sphere_obj->translation = vec4(i * 1.57f, 0.0f, j * 1.57f, 1.0f);
 				sphere_obj->scale = vec3(0.3f, 0.3f, 0.3f);
+				sphere_obj->sph_scale = vec3(0.3f, 0.3f, 0.3f);
 				objects.push_back(sphere_obj);
 			}
 		}
