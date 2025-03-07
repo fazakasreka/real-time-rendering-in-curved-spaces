@@ -4,7 +4,6 @@
 #include <glad/glad.h>
 #include <string>
 #include "texture.h"
-#include "hyperMaths.h"
 
 
 class GPUProgram {
