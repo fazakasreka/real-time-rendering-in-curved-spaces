@@ -150,7 +150,7 @@ public:
 		setUniform(state.Scale, "ScaleMatrix");
 		setUniform(state.Rotate, "RotateMatrix");
 		setUniform(state.Translate, "TranslateMatrix");
-		setUniform(state.MVP, "MVPMatrix");
+		setUniform(state.VP, "VPMatrix");
 
 		setUniform(state.wEye, "wEye");
 
@@ -234,17 +234,12 @@ public:
 		nStrips = N;
 		std::vector<VertexData> vtxData;	// vertices on the CPU
 		
-		// Generate vertex data in parameter space
+		// Generate vertex data
 		for (int i = 0; i < N; i++) {
 			for (int j = 0; j <= M; j++) {
 				vtxData.push_back(GenVertexData((float)j / M, (float)i / N));
 				vtxData.push_back(GenVertexData((float)j / M, (float)(i + 1) / N));
 			}
-		}
-
-		// Scale the geometry (now in Euclidean space)
-		for (auto& vtx : vtxData) {
-			vtx.position = vtx.position * ScaleMatrix(vec3(0.1, 0.1, 0.1));
 		}
 
 		// Set up OpenGL buffers
@@ -254,7 +249,7 @@ public:
 		glEnableVertexAttribArray(2);  // texcoord
 		glVertexAttribPointer(0, 4, GL_FLOAT, GL_FALSE, sizeof(VertexData), (void*)offsetof(VertexData, position));
 		glVertexAttribPointer(1, 4, GL_FLOAT, GL_FALSE, sizeof(VertexData), (void*)offsetof(VertexData, normal));
-		glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, sizeof(VertexData), (void*)offsetof(VertexData, texcoord));
+		glVertexAttribPointer(2, 4, GL_FLOAT, GL_FALSE, sizeof(VertexData), (void*)offsetof(VertexData, texcoord));
 	}
 
 	void Draw() {
@@ -342,7 +337,7 @@ public:
 		state.Scale = Scale;	
 		state.Rotate = Rotate;
 		state.Translate = Translate;
-		state.MVP = state.Translate * state.V * state.P;
+		state.VP = state.V * state.P;
 		state.material = material;
 		state.texture = texture;
 		shader->Bind(state);
@@ -391,7 +386,7 @@ public:
 			);
 			float height = y * 1.0f;  // Use consistent spacing
 			plane_obj->translation = vec4(0.0f, height, 0.0f, 1.0f);
-			plane_obj->scale = vec3(10.0f, 10.0f, 10.0f);
+			plane_obj->scale = vec3(3.0f, 3.0f, 3.0f);
 
 			objects.push_back(plane_obj);
 
@@ -406,7 +401,7 @@ public:
 			vertical_plane_obj->rotationAxis = vec3(0, 0, 1);
 			vertical_plane_obj->rotationAngle = M_PI / 2.0f;
 			vertical_plane_obj->translation = vec4(height, 0.0f, 0.0f, 1.0f);
-			vertical_plane_obj->scale = vec3(10.0f, 10.0f, 10.0f);
+			vertical_plane_obj->scale = vec3(3.0f, 3.0f, 3.0f);
 			objects.push_back(vertical_plane_obj);
 		
 		}
@@ -416,6 +411,7 @@ public:
 			for (int j = -1; j <= 1; j++) {
 				Object * sphere_obj = new Object(geomShader, material, texture4x4, sphere_geom);
 				sphere_obj->translation = vec4(i * 1.57f, 0.0f, j * 1.57f, 1.0f);
+				sphere_obj->scale = vec3(0.3f, 0.3f, 0.3f);
 				objects.push_back(sphere_obj);
 			}
 		}

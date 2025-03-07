@@ -9,7 +9,7 @@ struct Light {
 uniform mat4  ScaleMatrix;
 uniform mat4  RotateMatrix;
 uniform mat4  TranslateMatrix;
-uniform mat4  MVPMatrix;
+uniform mat4  VPMatrix;
 
 uniform Light[8] lights;
 uniform int   nLights;
@@ -69,9 +69,8 @@ vec4 transformVectorToCurrentSpace(vec4 vector, vec4 point) {
 }
 
 void main() {
-    vec4 geomPoint = portEucToGeom(eucVtxPos * ScaleMatrix * RotateMatrix);
-    vec4 wPos = geomPoint * TranslateMatrix;
-    gl_Position = geomPoint * MVPMatrix; // to NDC
+    vec4 wPos = portEucToGeom(eucVtxPos * ScaleMatrix * RotateMatrix) * TranslateMatrix;
+    gl_Position = wPos * VPMatrix; // to NDC
 
     for(int i = 0; i < nLights; i++) 
         wLight[i] = direction(portEucToGeom(lights[i].wLightPos), wPos);
