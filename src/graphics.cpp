@@ -25,18 +25,14 @@ struct Camera {
 public:
 	Camera() {
 		asp = (float)windowWidth / windowHeight;
-		fov = 60.0f * (float)M_PI / 180.0f;
-		fp = 0.01f;
+		fov = 90.0f * (float)M_PI / 180.0f;
 		
-		if (curvature == SPH) {
-			bp = M_PI;  // Maximum distance in spherical space is π
-		}
-		else if (curvature == HYP) {
-			bp = 30.0f;
-		}
-		else {
-			bp = 100.0f;
-		}
+		fp = 0.01f;
+
+		if (curvature == SPH) 
+			bp = 3.14f; 
+		else 
+			bp = 30.f;
 	}
 
 	void pan(float deltaX, float deltaY){ //x and y are in the range of -1 to 1
