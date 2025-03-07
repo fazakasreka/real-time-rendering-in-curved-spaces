@@ -325,7 +325,7 @@ public:
 			Scale = ScaleMatrix(scale);
 		}
 		Rotate = RotationMatrix(rotationAngle, rotationAxis);
-		Translate = TranslateMatrix(translation);
+		Translate = TranslateMatrix(transformPointToCurrentSpace(translation));
 	}
 
 	void Draw(RenderState state) {
