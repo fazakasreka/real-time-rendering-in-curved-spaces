@@ -44,7 +44,7 @@ vec4 direction(vec4 to, vec4 from) {
     return normalize(to - from);
 }
 
-vec4 portEucToGeom(vec4 eucPoint) {
+vec4 transformPointToCurrentSpace(vec4 eucPoint) {
     vec3 P = eucPoint.xyz;
     float distance = length(P);
     if (distance < 0.0001f) return eucPoint;
@@ -67,14 +67,13 @@ vec4 transformVectorToCurrentSpace(vec4 vector, vec4 point) {
 		vec4(-(alph * (z*x / (1 + w))),		-(alph * (z*y / (1 + w))),		1- (alph * (z*z / (1 + w))),	-alph * z),
 		vec4(x,								y,								z,							w));
 }
-
 void main() {
-    vec4 wPos = portEucToGeom(eucVtxPos * ScaleMatrix * RotateMatrix) * TranslateMatrix;
-    gl_Position = wPos * VPMatrix; // to NDC
+    vec4 wPos = transformPointToCurrentSpace(eucVtxPos * ScaleMatrix * RotateMatrix) * TranslateMatrix;
+    gl_Position = wPos * VPMatrix;
 
     for(int i = 0; i < nLights; i++) 
-        wLight[i] = direction(portEucToGeom(lights[i].wLightPos), wPos);
-    wView  = direction(portEucToGeom(wEye), wPos);
+        wLight[i] = direction(transformPointToCurrentSpace(lights[i].wLightPos), wPos);
+    wView  = direction(transformPointToCurrentSpace(wEye), wPos);
     if (LorentzSign == 0) {
         wNormal = RotateMatrix * eucVtxNorm;
         wNormal.w = 0;

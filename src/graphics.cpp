@@ -15,7 +15,7 @@ enum Direction
 };
 
 struct Camera { 
-	vec4 eucPosition = vec4(0, 0, 0.0, 1.0f);
+	vec4 eucPosition = vec4(0, 0, 5.0, 1.0f);
 	vec4 velocity = vec4(0, 0, 0, 0);
 	vec4 lookAt = vec4(0, 0, -1, 0);
 	vec4 up =	 vec4(0, 1, 0, 0);
@@ -380,9 +380,9 @@ public:
 				plane_geom, 
 				y==0 //draw in spherical space
 			);
-			float height = y * 1.0f;  // Use consistent spacing
+			float height = y * 1.0f - 0.5f;  // Use consistent spacing
 			plane_obj->translation = vec4(0.0f, height, 0.0f, 1.0f);
-			plane_obj->scale = vec3(3.0f, 3.0f, 3.0f);
+			plane_obj->scale = vec3(2.0f, 2.0f, 2.0f);
 
 			objects.push_back(plane_obj);
 
@@ -397,7 +397,7 @@ public:
 			vertical_plane_obj->rotationAxis = vec3(0, 0, 1);
 			vertical_plane_obj->rotationAngle = M_PI / 2.0f;
 			vertical_plane_obj->translation = vec4(height, 0.0f, 0.0f, 1.0f);
-			vertical_plane_obj->scale = vec3(3.0f, 3.0f, 3.0f);
+			vertical_plane_obj->scale = vec3(2.0f, 2.0f, 2.0f);
 			objects.push_back(vertical_plane_obj);
 		
 		}
