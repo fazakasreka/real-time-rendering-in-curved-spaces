@@ -26,13 +26,7 @@ public:
 	Camera() {
 		asp = (float)windowWidth / windowHeight;
 		fov = 90.0f * (float)M_PI / 180.0f;
-		
 		fp = 0.01f;
-
-		if (curvature == SPH) 
-			bp = 3.14f; 
-		else 
-			bp = 10.f;
 	}
 
 	void pan(float deltaX, float deltaY){ //x and y are in the range of -1 to 1
@@ -65,7 +59,7 @@ public:
 
 			eucPosition = eucPosition + direction * dt * 1.0f;
 
-			if (curvature == SPH) { //we walked around int the spherical world
+			if (getCurvature() == SPH) { //we walked around int the spherical world
 				vec4 sphPosition = transformPointToCurrentSpace(eucPosition);
 				if(sphPosition.w < 0) {
 					eucPosition = -eucPosition;
@@ -75,7 +69,7 @@ public:
 	}
 
 	mat4 V() { // view matrix: translates the center to the origin
-		if (curvature == EUC) {
+		if (getCurvature() == EUC) {
 			vec3 wVup = vec3(0, 1, 0);
 
 			vec3 k_ = normalize(vec3(-lookAt.x, -lookAt.y, -lookAt.z));
@@ -95,7 +89,7 @@ public:
 			vec4 wVup = transformVectorToCurrentSpace(up, geomPosition);
 
 
-			float alpha = curvature;
+			float alpha = getCurvature();
 
 			vec4 k_ = normalize(-lookAtTransformed);
 			vec4 i_ = normalize(smartCross(geomPosition, wVup, k_)) * alpha;
@@ -110,9 +104,14 @@ public:
 	}
 
 	mat4 P() { // projection matrix: transforms the view frustum to the canonical view volume
+		if (getCurvature() == SPH) 
+			bp = 3.14f; 
+		else 
+			bp = 10.f;
+
 		float A, B;
 
-		if (curvature == EUC) {
+		if (getCurvature() == EUC) {
 			A = -(fp + bp) / (bp - fp);
 			B = -2 *fp*bp / (bp - fp);
 		}
@@ -140,7 +139,7 @@ public:
 	void Bind(RenderState state) {
 		Use();      // make this program run
 		
-		setUniform(curvature, "curvature");
+		setUniform(getCurvature(), "curvature");
 
 		setUniform(state.Scale, "ScaleMatrix");
 		setUniform(state.Rotate, "RotateMatrix");
@@ -319,7 +318,7 @@ public:
 	}
 
 	virtual void SetModelingTransform(mat4& Scale, mat4& Rotate, mat4& Translate) {
-		if(curvature == SPH){
+		if(getCurvature() == SPH){
 			Scale = ScaleMatrix(sph_scale);
 		}else{
 			Scale = ScaleMatrix(scale);
@@ -329,7 +328,7 @@ public:
 	}
 
 	void Draw(RenderState state) {
-		if(curvature == SPH && !draw_in_spherical_space) {
+		if(getCurvature() == SPH && !draw_in_spherical_space) {
 			return;
 		}
 		mat4 Scale, Rotate, Translate;

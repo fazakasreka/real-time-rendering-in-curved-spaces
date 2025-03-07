@@ -9,6 +9,7 @@ extern float curvature;
 extern int windowWidth;
 extern int windowHeight;
 
-void setCurvature(int newCurvature);
+void setCurvature(float newCurvature);
+float getCurvature();
 
 #endif // GLOBAL_CONSTANTS_H
