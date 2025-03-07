@@ -276,8 +276,8 @@ public:
 	}
 
 	void eval(Dnum2& U, Dnum2& V, Dnum2& X, Dnum2& Y, Dnum2& Z) override {
-		U = U * 2.0f * (float)M_PI - 2.0f * (float)M_PI / 2.0f;
-		V = V * 2.0f * (float)M_PI - 2.0f * (float)M_PI / 2.0f;
+		U = U - 0.5f;
+		V = V - 0.5f;
 		
 		X = U;
 		Y = Dnum2(0.0f);  // Constant height
@@ -380,7 +380,7 @@ public:
 			);
 			float height = y * 1.0f - 0.5f;  // Use consistent spacing
 			plane_obj->translation = vec4(0.0f, height, 0.0f, 1.0f);
-			plane_obj->scale = vec3(2.0f, 2.0f, 2.0f);
+			plane_obj->scale = vec3(3.14f, 3.14f, 3.14f);
 
 			objects.push_back(plane_obj);
 
