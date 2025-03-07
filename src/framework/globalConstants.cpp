@@ -1,6 +1,6 @@
 #include "globalConstants.h"
 
-float curvature = HYP;
+float curvature = EUC;
 int windowWidth = 800;
 int windowHeight = 600;
 

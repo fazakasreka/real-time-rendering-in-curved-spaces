@@ -15,7 +15,12 @@ uniform Material material;
 uniform Light[8] lights;    // light sources 
 uniform int   nLights;
 uniform sampler2D diffuseTexture;
-uniform float LorentzSign;
+
+const float EUC = 0.0;
+const float SPH = 1.0;
+const float HYP = -1.0;
+uniform float curvature;
+
 in  vec4 wNormal;       // interpolated world sp normal
 in  vec4 wView;         // interpolated world sp view
 in  vec4 wLight[8];     // interpolated world sp illum dir
@@ -23,6 +28,7 @@ in  vec2 texcoord;
 out vec4 fragmentColor; // output goes to frame buffer
 
 float dotGeom(vec4 u, vec4 v) {
+    float LorentzSign = curvature == HYP ? -1.0 : 1.0;
     return u.x * v.x + u.y * v.y + u.z * v.z + LorentzSign * u.w * v.w;
 }
 

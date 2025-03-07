@@ -15,7 +15,7 @@ enum Direction
 };
 
 struct Camera { 
-	vec4 eucPosition = vec4(0, 0, 5.0, 1.0f);
+	vec4 eucPosition = vec4(0, 0.2, 2.0, 1.0f);
 	vec4 velocity = vec4(0, 0, 0, 0);
 	vec4 lookAt = vec4(0, 0, -1, 0);
 	vec4 up =	 vec4(0, 1, 0, 0);
@@ -32,7 +32,7 @@ public:
 		if (curvature == SPH) 
 			bp = 3.14f; 
 		else 
-			bp = 30.f;
+			bp = 10.f;
 	}
 
 	void pan(float deltaX, float deltaY){ //x and y are in the range of -1 to 1
@@ -139,9 +139,8 @@ public:
 
 	void Bind(RenderState state) {
 		Use();      // make this program run
-		int sign = (curvature == HYP) ? -1 : 1;
-		setUniform(sign, "LorentzSign");
-
+		
+		setUniform(curvature, "curvature");
 
 		setUniform(state.Scale, "ScaleMatrix");
 		setUniform(state.Rotate, "RotateMatrix");
@@ -238,14 +237,13 @@ public:
 			}
 		}
 
-		// Set up OpenGL buffers
 		glBufferData(GL_ARRAY_BUFFER, nVtxPerStrip * nStrips * sizeof(VertexData), &vtxData[0], GL_STATIC_DRAW);
 		glEnableVertexAttribArray(0);  // position
 		glEnableVertexAttribArray(1);  // normal
 		glEnableVertexAttribArray(2);  // texcoord
 		glVertexAttribPointer(0, 4, GL_FLOAT, GL_FALSE, sizeof(VertexData), (void*)offsetof(VertexData, position));
 		glVertexAttribPointer(1, 4, GL_FLOAT, GL_FALSE, sizeof(VertexData), (void*)offsetof(VertexData, normal));
-		glVertexAttribPointer(2, 4, GL_FLOAT, GL_FALSE, sizeof(VertexData), (void*)offsetof(VertexData, texcoord));
+		glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, sizeof(VertexData), (void*)offsetof(VertexData, texcoord));
 	}
 
 	void Draw() {
