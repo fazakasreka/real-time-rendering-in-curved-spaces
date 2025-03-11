@@ -74,17 +74,3 @@ _On macOS OpenGL should be included with Xcode. On Windows with Visual Studio._
 - If none of this works, uninstall and reinstall:
     `sudo rm -rf /Library/Developer/CommandLineTools`
     `xcode-select --install`
-
-
-
-## What is GLAD and GLFW for?
-
-```
-  Non-Euclidean Space program
-     ↑
-    GLFW  ←→  Operating System (windows, input, events)
-     ↑
-    GLAD  ←→  Graphics Driver (OpenGL functions)
-     ↑
-  Graphics Hardware
-```
