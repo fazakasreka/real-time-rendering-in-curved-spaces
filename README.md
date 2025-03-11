@@ -20,8 +20,8 @@ Based on the paper [Adapting Game Engines to Curved Spaces](https://link.springe
 ### 2. Run CMake
 
     mkdir build
-    cmake -B build -S . #run when you first make the project OR make changes to the CMakeLists.txt
-    cmake --build build #run when you first make the project OR make changes to the code
+    cmake -B build -S . #re-run when you make changes to the CMakeLists.txt
+    cmake --build build #re-run when you make changes to the code
 
 
 ### 3. Run the executable
@@ -32,6 +32,17 @@ Based on the paper [Adapting Game Engines to Curved Spaces](https://link.springe
 
     cmake --build build && ./build/non-euclidean-space
 
+
+## Controls
+    1 - Hyperbolic space
+    2 - Euclidean space
+    3 - Spherical space
+    W - forward
+    S - backward
+    A - left
+    D - right
+    E - up
+    Q - down
 
 ## Common issues and solutions
 

@@ -1,9 +1,11 @@
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
 #include <iostream>
-#include "graphics.cpp"
+#include "scene.cpp"
 
 Scene scene;
+int windowWidth = 1200;
+int windowHeight = 800;
 
 Direction cameraDirection = NONE;
 double mouseDeltaX = 0.0;
@@ -42,11 +44,11 @@ void processInput(GLFWwindow* window) {
 
     // Change curvature
     if (glfwGetKey(window, GLFW_KEY_1) == GLFW_PRESS)
-        setCurvature(HYP);
+        Curvature::setCurvature(HYP);
     else if (glfwGetKey(window, GLFW_KEY_2) == GLFW_PRESS)
-        setCurvature(EUC);
+        Curvature::setCurvature(EUC);
     else if (glfwGetKey(window, GLFW_KEY_3) == GLFW_PRESS)
-        setCurvature(SPH);
+        Curvature::setCurvature(SPH);
 }
 
 void mouseButtonCallback(GLFWwindow* window, int button, int action, int mods) {
@@ -66,7 +68,7 @@ double mouseY = 0.0;
 void mouseCallback(GLFWwindow* window, double xpos, double ypos) {
     if (leftMousePressed) {
         float newMouseX = (xpos / windowWidth * 2.0) - 1.0;
-        float newMouseY = 1.0 - (ypos /windowHeight * 2.0);
+        float newMouseY = 1.0 - (ypos / windowHeight * 2.0);
         mouseDeltaX = newMouseX - mouseX;
         mouseDeltaY = newMouseY - mouseY;
         mouseX = newMouseX;
@@ -93,7 +95,7 @@ int main() {
     glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
 #endif
 
-    GLFWwindow* window = glfwCreateWindow(800, 600, "Non Euclidean Space", nullptr, nullptr);
+    GLFWwindow* window = glfwCreateWindow(windowWidth, windowHeight, "Non Euclidean Space", nullptr, nullptr);
     if (!window) {
         std::cerr << "Failed to create GLFW window" << std::endl;
         glfwTerminate();
@@ -120,6 +122,7 @@ int main() {
     
     // Build scene
     scene.Build();
+    scene.camera.updateAspectRatio(windowWidth, windowHeight);
 
     // Animation timing
     float lastFrame = 0.0f;

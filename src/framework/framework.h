@@ -1,5 +1,5 @@
-#include "hyperMaths.h"
-#include "texture.h"
+#include "frameworkMath.h"
+#include "geometry.h"
 #include "gpuProgram.h"
 #include "shader.h"
-#include "globalConstants.h"
+#include "texture.h"

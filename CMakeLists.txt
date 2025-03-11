@@ -10,17 +10,22 @@ find_package(OpenGL REQUIRED)
 add_subdirectory(external/glfw)
 
 add_executable(${PROJECT_NAME} 
-    src/main.cpp
-    src/framework/globalConstants.cpp
-    src/framework/gpuProgram.cpp
-    src/framework/texture.cpp
-    src/framework/shader.cpp
     external/glad/src/glad.c
+    src/main.cpp
+
+    src/framework/geometry.cpp
+    src/framework/gpuProgram.cpp
+    src/framework/shader.cpp
+    src/framework/texture.cpp
+
+    src/non-euclidean/curvature.cpp
+    src/non-euclidean/geomCamera.cpp
 )
 
 target_include_directories(${PROJECT_NAME} PRIVATE
     src
     src/framework
+    src/non-euclidean
     external/glad/include
     external/glfw/include
 )

@@ -4,7 +4,7 @@
 #include <glad/glad.h>
 #include <string>
 #include <vector>
-#include "hyperMaths.h"
+#include "frameworkMath.h"
 
 class Texture {
     std::vector<vec4> load(std::string pathname, bool transparent, int& width, int& height);

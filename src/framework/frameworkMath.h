@@ -1,5 +1,5 @@
-#ifndef HYPERMATHS_H
-#define HYPERMATHS_H
+#ifndef FRAMEWORK_MATH_H
+#define FRAMEWORK_MATH_H
 
 #define _USE_MATH_DEFINES
 #include <stdio.h>
@@ -9,25 +9,7 @@
 #include <string>
 #include <iostream>
 
-#include "globalConstants.h"
-
-
-inline float smartSin(float x) {
-	if (getCurvature() == HYP) return sinhf(x);
-	return sinf(x);
-}
-
-inline float smartCos(float x) {
-	if (getCurvature() == HYP) return coshf(x);
-	return cosf(x);
-}
-
-inline float smartArcCos(float x) {
-	if (getCurvature() == HYP) return acoshf(x);
-	return acosf(x);
-
-}
-
+//vec2
 struct vec2 {
 	float x, y;
 
@@ -40,16 +22,18 @@ struct vec2 {
 	vec2 operator-() const { return vec2(-x, -y); }
 };
 
-inline float dotEu(const vec2& v1, const vec2& v2) {
+inline vec2 operator*(float a, const vec2& v) { return vec2(v.x * a, v.y * a); }
+
+inline float euclideanDot(const vec2& v1, const vec2& v2) {
 	return (v1.x * v2.x + v1.y * v2.y);
 }
 
-inline float length(const vec2& v) { return sqrtf(dotEu(v, v)); }
+inline float euclideanLength(const vec2& v) { return sqrtf(euclideanDot(v, v)); }
 
-inline vec2 normalize(const vec2& v) { return v * (1 / length(v)); }
+inline vec2 euclideanNormalize(const vec2& v) { return v * (1 / euclideanLength(v)); }
 
-inline vec2 operator*(float a, const vec2& v) { return vec2(v.x * a, v.y * a); }
 
+//vec3
 struct vec3 {
 	float x, y, z;
 
@@ -67,15 +51,20 @@ struct vec3 {
 	float operator[](int j) const { return *(&x + j); }
 };
 
-inline float dotEu(const vec3& v1, const vec3& v2) { return (v1.x * v2.x + v1.y * v2.y + v1.z * v2.z); }
-inline float length(const vec3& v) { return sqrtf(dotEu(v, v)); }
-inline vec3 normalize(const vec3& v) { return v * (1 / length(v)); }
-inline vec3 cross(const vec3& v1, const vec3& v2) {
-	return vec3(v1.y * v2.z - v1.z * v2.y, v1.z * v2.x - v1.x * v2.z, v1.x * v2.y - v1.y * v2.x);
-}
 inline vec3 operator*(float a, const vec3& v) { return vec3(v.x * a, v.y * a, v.z * a); }
 
+inline float euclideanDot(const vec3& v1, const vec3& v2) { return (v1.x * v2.x + v1.y * v2.y + v1.z * v2.z); }
 
+inline float euclideanLength(const vec3& v) { return sqrtf(euclideanDot(v, v)); }
+
+inline vec3 euclideanNormalize(const vec3& v) { return v * (1 / euclideanLength(v)); }
+
+inline vec3 euclideanCross(const vec3& v1, const vec3& v2) {
+	return vec3(v1.y * v2.z - v1.z * v2.y, v1.z * v2.x - v1.x * v2.z, v1.x * v2.y - v1.y * v2.x);
+}
+
+
+//vec4
 struct vec4 {
 	float x, y, z, w;
 
@@ -92,34 +81,16 @@ struct vec4 {
 	vec4 operator-()  const { return vec4(-x, -y, -z, -w); }
 };
 
+inline vec4 operator*(float a, const vec4& v) {
+	return vec4(v.x * a, v.y * a, v.z * a, v.w * a);
+}
+
 inline vec4 oppositeVector() {
 	return vec4(-1, -1, -1, 1);
 }
 
-inline float dot(const vec4& v1, const vec4& v2) {
-	if (getCurvature() == HYP) return (v1.x * v2.x + v1.y * v2.y + v1.z * v2.z - v1.w * v2.w);
-	return (v1.x * v2.x + v1.y * v2.y + v1.z * v2.z + v1.w * v2.w);
-}
 
-inline vec4 operator*(float a, const vec4& v) {
-	return vec4(v.x * a, v.y * a, v.z * a, v.w * a);
-}
-inline float length(const vec4& v) { return sqrtf(dot(v, v)); }
-
-inline vec4 normalize(const vec4& v) { return v * (1 / length(v)); }
-
-inline float distance(vec4 p, vec4 q) {
-	if (getCurvature() == EUC) {
-		vec4 direction = p - q;
-			return length(direction);
-	}
-	else{
-		return smartArcCos(-dot(q, p));
-	}
-}
-
-
-
+//mat3
 struct mat3 { // row-major matrix 3x3
 	vec3 rows[3];
 public:
@@ -141,25 +112,8 @@ inline float det(const mat3& m) {
 		m[0][2] * (m[1][0] * m[2][1] - m[1][1] * m[2][0]);
 }
 
-inline vec4 smartCross(const vec4& t, const vec4& a, const vec4& b) {
-	float alph = getCurvature();
-	mat3 mx(t.y, t.z, alph * t.w,
-		a.y, a.z, alph * a.w,
-		b.y, b.z, alph * b.w);
-	mat3 my(t.x, t.z, alph * t.w,
-		a.x, a.z, alph * a.w,
-		b.x, b.z, alph * b.w);
-	mat3 mz(t.x, t.y, alph * t.w,
-		a.x, a.y, alph * a.w,
-		b.x, b.y, alph * b.w);
-	mat3 mw(t.x, t.y, t.z,
-		a.x, a.y, a.z,
-		b.x, b.y, b.z);
-	return vec4(det(mx), -det(my), det(mz), -det(mw));
-}
 
-
-
+//mat4
 struct mat4 { // row-major matrix 4x4
 	vec4 rows[4];
 public:
@@ -192,21 +146,6 @@ inline mat4 operator*(const mat4& left, const mat4& right) {
 	return result;
 }
 
-inline mat4 TranslateMatrix(vec4 position) {
-
-	float alph = getCurvature();
-	float x = position.x;
-	float y = position.y;
-	float z = position.z;
-	float w = position.w;
-
-	return mat4(
-		vec4(1 - (alph * (x*x / (1 + w))),	-(alph * (x*y / (1 + w))),		-(alph * (x*z / (1 + w))),	-alph * x),
-		vec4(-(alph * (y*x / (1 + w))),		1 - (alph * (y*y / (1 + w))),	-(alph * (y*z / (1 + w))),	-alph * y),
-		vec4(-(alph * (z*x / (1 + w))),		-(alph * (z*y / (1 + w))),		1- (alph * (z*z / (1 + w))),	-alph * z),
-		vec4(x,								y,								z,							w));
-}
-
 inline mat4 ScaleMatrix(vec3 s) {
 	return mat4(vec4(s.x, 0,   0,   0),
 			    vec4(0,   s.y, 0,   0),
@@ -216,40 +155,11 @@ inline mat4 ScaleMatrix(vec3 s) {
 
 inline mat4 RotationMatrix(float angle, vec3 w) {
 	float c = cosf(angle), s = sinf(angle);
-	w = normalize(w);
+	w = euclideanNormalize(w);
 	return mat4(vec4(c * (1 - w.x*w.x) + w.x*w.x, w.x*w.y*(1 - c) + w.z*s, w.x*w.z*(1 - c) - w.y*s, 0),
 			    vec4(w.x*w.y*(1 - c) - w.z*s, c * (1 - w.y*w.y) + w.y*w.y, w.y*w.z*(1 - c) + w.x*s, 0),
 			    vec4(w.x*w.z*(1 - c) + w.y*s, w.y*w.z*(1 - c) - w.x*s, c * (1 - w.z*w.z) + w.z*w.z, 0),
 			    vec4(0, 0, 0, 1));
-}
-
-
-inline vec4 transformVectorToCurrentSpace(float x, float y, float z, const vec4& point) {
-	if (getCurvature() == EUC) return vec4(x, y, z, 0.0f);
-	return vec4(x, y , z, 0) * TranslateMatrix(point);
-}
-inline vec4 transformVectorToCurrentSpace(vec4& vector, vec4& point) {
-	if (getCurvature() == EUC) return vector;
-	return vector * TranslateMatrix(point);
-}
-
-inline vec4 transformPointToCurrentSpace(float x, float y, float z) {
-
-	if (getCurvature() == EUC) return vec4(x, y, z, 1.0f);
-
-	vec3 epoint(x, y, z);
-	float dist = sqrtf(dotEu(epoint, epoint)) + 0.000001f;
-	vec4 v(epoint.x / dist, epoint.y / dist, epoint.z / dist, 0);
-	return vec4(0, 0, 0, 1) * smartCos(dist) + v * smartSin(dist);
-}
-inline vec4 transformPointToCurrentSpace(vec4& point) {
-
-	if (getCurvature() == EUC) return point;
-
-	vec3 epoint(point.x, point.y, point.z);
-	float dist = sqrtf(dotEu(epoint, epoint)) + 0.000001f;
-	vec4 v(epoint.x / dist, epoint.y / dist, epoint.z / dist, 0);
-	return vec4(0, 0, 0, 1) * smartCos(dist) + v * smartSin(dist);
 }
 
 template<class T> struct Dnum { // Dual numbers for automatic derivation
@@ -280,4 +190,4 @@ template<class T> Dnum<T> Pow(Dnum<T> g, float n) {
 
 typedef Dnum<vec2> Dnum2;
 
-#endif // HYPERMATHS_H
+#endif // FRAMEWORK_MATH_H
