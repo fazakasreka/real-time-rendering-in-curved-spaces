@@ -34,15 +34,19 @@ Based on the paper [Adapting Game Engines to Curved Spaces](https://link.springe
 
 
 ## Controls
+# Change geometry:
     1 - Hyperbolic space
     2 - Euclidean space
     3 - Spherical space
+# Move:
     W - forward
     S - backward
     A - left
     D - right
     E - up
     Q - down
+# Pan:
+    left click + drag
 
 ## Common issues and solutions
 
