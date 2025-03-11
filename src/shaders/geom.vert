@@ -87,15 +87,16 @@ void main() {
     ) * TranslateMatrix;
     gl_Position = wPos * VPMatrix;
 
-    for(int i = 0; i < nLights; i++) 
+    for(int i = 0; i < nLights; i++) {
         wLight[i] = direction(transformPointToCurrentSpace(lights[i].wLightPos), wPos);
-    wView  = direction(transformPointToCurrentSpace(wEye), wPos);
-    if (curvature == EUC) {
-        wNormal = RotateMatrix * eucVtxNorm;
-        wNormal.w = 0;
-    } else {
-        wNormal = transformVectorToCurrentSpace(RotateMatrix * eucVtxNorm, wPos);
     }
     
+    wView  = direction(transformPointToCurrentSpace(wEye), wPos);
+
+    wNormal = transformVectorToCurrentSpace(
+        eucVtxNorm * transpose(inverse(ScaleMatrix * RotateMatrix)),
+        wPos
+    );
+
     texcoord = vtxUV;
 }

@@ -217,7 +217,7 @@ public:
 		Light light2;
 		light2.La = vec3(1.5f, 1.5f, 1.5f);
 		light2.Le = vec3(3.0f, 3.0f, 3.0f);
-		light2.wLightPos = vec4(0.0f, 1.0f, 0.0f, 1.0f);
+		light2.wLightPos = vec4(0.0f, 3.0f, 0.0f, 1.0f);
 		lights.push_back(light2);
 
 		Light light3;
