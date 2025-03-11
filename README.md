@@ -6,48 +6,48 @@ Based on the paper [Adapting Game Engines to Curved Spaces](https://link.springe
 
 ## How to run
 
-### 0. Install CMake (if you don't have it already)
+##### 0. Install CMake (if you don't have it already)
 
     Windows: winget install Kitware.CMake
     Linux: sudo apt install cmake
     macOS: brew install cmake
 
-### 1. Install submodules (glfw)
+##### 1. Install submodules (glfw)
 
     git submodule update --init --recursive
 
 
-### 2. Run CMake
+##### 2. Run CMake
 
     mkdir build
     cmake -B build -S . #re-run when you make changes to the CMakeLists.txt
     cmake --build build #re-run when you make changes to the code
 
 
-### 3. Run the executable
+##### 3. Run the executable
 
     ./build/non-euclidean-space
 
-### 4. Build & run
+##### 4. Build & run
 
     cmake --build build && ./build/non-euclidean-space
 
 
 ## Controls
-#### Change geometry
+##### Change geometry
     1 - Hyperbolic space
     2 - Euclidean space
     3 - Spherical space
-#### Move
+##### Move
     W - forward
     S - backward
     A - left
     D - right
     E - up
     Q - down
-#### Pan
+##### Pan
     left click + drag
-### Teleport
+##### Teleport
     SPACE - If you get lost press space to teleport to the origin.
 
 ## Common issues and solutions
