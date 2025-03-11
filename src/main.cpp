@@ -49,6 +49,10 @@ void processInput(GLFWwindow* window) {
         Curvature::setEuclidean();
     else if (glfwGetKey(window, GLFW_KEY_3) == GLFW_PRESS)
         Curvature::setSpherical();
+
+    //teleport to origin
+    if (glfwGetKey(window, GLFW_KEY_SPACE) == GLFW_PRESS)
+        scene.camera.setPosition(vec4(0.0, 0.5, 0.5, 1.0));
 }
 
 void mouseButtonCallback(GLFWwindow* window, int button, int action, int mods) {

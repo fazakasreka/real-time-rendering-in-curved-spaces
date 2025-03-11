@@ -25,6 +25,7 @@ public:
     GeomCamera();
     void updateAspectRatio(int windowWidth, int windowHeight);
     vec4 getPosition();
+    void setPosition(vec4 position);
     void pan(float deltaX, float deltaY);
     void move(float dt, Direction move_direction);
     mat4 V();

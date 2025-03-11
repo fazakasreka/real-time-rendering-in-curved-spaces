@@ -47,6 +47,8 @@ Based on the paper [Adapting Game Engines to Curved Spaces](https://link.springe
     Q - down
 #### Pan:
     left click + drag
+### Teleport
+    SPACE - If you get lost press space to teleport to the origin.
 
 ## Common issues and solutions
 

@@ -15,6 +15,10 @@ vec4 GeomCamera::getPosition() {
     return eucPosition;
 }
 
+void GeomCamera::setPosition(vec4 position) {
+    eucPosition = position;
+}
+
 void GeomCamera::pan(float deltaX, float deltaY){ //x and y are in the range of -1 to 1
     vec3 lookAt3 = vec3(lookAt.x, lookAt.y, lookAt.z);
     vec3 up3 = vec3(up.x, up.y, up.z);
