@@ -44,11 +44,11 @@ void processInput(GLFWwindow* window) {
 
     // Change curvature
     if (glfwGetKey(window, GLFW_KEY_1) == GLFW_PRESS)
-        Curvature::setCurvature(HYP);
+        Curvature::setHyperbolic();
     else if (glfwGetKey(window, GLFW_KEY_2) == GLFW_PRESS)
-        Curvature::setCurvature(EUC);
+        Curvature::setEuclidean();
     else if (glfwGetKey(window, GLFW_KEY_3) == GLFW_PRESS)
-        Curvature::setCurvature(SPH);
+        Curvature::setSpherical();
 }
 
 void mouseButtonCallback(GLFWwindow* window, int button, int action, int mods) {

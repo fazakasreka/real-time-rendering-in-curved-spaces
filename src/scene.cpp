@@ -107,7 +107,7 @@ public:
 	}
 
 	virtual void SetModelingTransform(mat4& Scale, mat4& Rotate, mat4& Translate) {
-		if(Curvature::getCurvature() == SPH){
+		if(Curvature::isSpherical()){
 			Scale = ScaleMatrix(sph_scale);
 		}else{
 			Scale = ScaleMatrix(scale);
@@ -117,7 +117,7 @@ public:
 	}
 
 	void Draw(RenderState state) {
-		if(Curvature::getCurvature() == SPH && !draw_in_spherical_space) {
+		if(Curvature::isSpherical() && !draw_in_spherical_space) {
 			return;
 		}
 		mat4 Scale, Rotate, Translate;

@@ -49,7 +49,7 @@ void GeomCamera::move(float dt, Direction move_direction){
 
     eucPosition = eucPosition + direction * dt * 1.0f;
 
-    if (Curvature::getCurvature() == SPH)
+    if (Curvature::isSpherical())
     { // we walked around int the spherical world
         vec4 sphPosition = transformPointToCurrentSpace(eucPosition);
         if (sphPosition.w < 0)
@@ -61,7 +61,7 @@ void GeomCamera::move(float dt, Direction move_direction){
 }
 
 mat4 GeomCamera::V() { // view matrix: translates the center to the origin
-    if (Curvature::getCurvature() == EUC) {
+    if (Curvature::isEuclidean()) {
         vec3 wVup = vec3(0, 1, 0);
 
         vec3 k_ = euclideanNormalize(vec3(-lookAt.x, -lookAt.y, -lookAt.z));
@@ -96,14 +96,14 @@ mat4 GeomCamera::V() { // view matrix: translates the center to the origin
 }
 
 mat4 GeomCamera::P() { // projection matrix: transforms the view frustum to the canonical view volume
-    if (Curvature::getCurvature() == SPH) 
+    if (Curvature::isSpherical()) 
         bp = 3.14f; 
     else 
         bp = 10.f;
 
     float A, B;
 
-    if (Curvature::getCurvature() == EUC) {
+    if (Curvature::isEuclidean()) {
         A = -(fp + bp) / (bp - fp);
         B = -2 *fp*bp / (bp - fp);
     }

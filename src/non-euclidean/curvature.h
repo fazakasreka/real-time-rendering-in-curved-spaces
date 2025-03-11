@@ -10,8 +10,13 @@ class Curvature {
         static float curvature;
         
     public:
-        static void setCurvature(float newCurvature);
         static float getCurvature();
+        static bool isHyperbolic();
+        static bool isSpherical();
+        static bool isEuclidean();
+        static void setHyperbolic();
+        static void setSpherical();
+        static void setEuclidean();
 };
 
 #endif // GLOBAL_CONSTANTS_H

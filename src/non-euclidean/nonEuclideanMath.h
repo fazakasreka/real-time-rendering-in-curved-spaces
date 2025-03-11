@@ -10,23 +10,23 @@
 #include "curvature.h"
 
 inline float smartSin(float x) {
-	if (Curvature::getCurvature() == HYP) return sinhf(x);
+	if (Curvature::isHyperbolic()) return sinhf(x);
 	return sinf(x);
 }
 
 inline float smartCos(float x) {
-	if (Curvature::getCurvature() == HYP) return coshf(x);
+	if (Curvature::isHyperbolic()) return coshf(x);
 	return cosf(x);
 }
 
 inline float smartArcCos(float x) {
-	if (Curvature::getCurvature() == HYP) return acoshf(x);
+	if (Curvature::isHyperbolic()) return acoshf(x);
 	return acosf(x);
 
 }
 
 inline float smartDot(const vec4& v1, const vec4& v2) {
-	if (Curvature::getCurvature() == HYP) return (v1.x * v2.x + v1.y * v2.y + v1.z * v2.z - v1.w * v2.w);
+	if (Curvature::isHyperbolic()) return (v1.x * v2.x + v1.y * v2.y + v1.z * v2.z - v1.w * v2.w);
 	return (v1.x * v2.x + v1.y * v2.y + v1.z * v2.z + v1.w * v2.w);
 }
 
@@ -35,7 +35,7 @@ inline float smartLength(const vec4& v) { return sqrtf(smartDot(v, v)); }
 inline vec4 smartNormalize(const vec4& v) { return v * (1 / smartLength(v)); }
 
 inline float smartDistance(vec4 p, vec4 q) {
-	if (Curvature::getCurvature() == EUC) {
+	if (Curvature::isEuclidean()) {
 		vec4 direction = p - q;
 			return smartLength(direction);
 	}
@@ -77,17 +77,17 @@ inline mat4 TranslateMatrix(vec4 position) {
 }
 
 inline vec4 transformVectorToCurrentSpace(float x, float y, float z, const vec4& point) {
-	if (Curvature::getCurvature() == EUC) return vec4(x, y, z, 0.0f);
+	if (Curvature::isEuclidean()) return vec4(x, y, z, 0.0f);
 	return vec4(x, y , z, 0) * TranslateMatrix(point);
 }
 inline vec4 transformVectorToCurrentSpace(vec4& vector, vec4& point) {
-	if (Curvature::getCurvature() == EUC) return vector;
+	if (Curvature::isEuclidean()) return vector;
 	return vector * TranslateMatrix(point);
 }
 
 inline vec4 transformPointToCurrentSpace(float x, float y, float z) {
 
-	if (Curvature::getCurvature() == EUC) return vec4(x, y, z, 1.0f);
+	if (Curvature::isEuclidean()) return vec4(x, y, z, 1.0f);
 
 	vec3 eucPoint(x, y, z);
 	float dist = sqrtf(euclideanDot(eucPoint, eucPoint)) + 0.000001f;
@@ -96,7 +96,7 @@ inline vec4 transformPointToCurrentSpace(float x, float y, float z) {
 }
 inline vec4 transformPointToCurrentSpace(vec4& point) {
 
-	if (Curvature::getCurvature() == EUC) return point;
+	if (Curvature::isEuclidean()) return point;
 
 	vec3 eucPoint(point.x, point.y, point.z);
 	float dist = sqrtf(euclideanDot(eucPoint, eucPoint)) + 0.000001f;

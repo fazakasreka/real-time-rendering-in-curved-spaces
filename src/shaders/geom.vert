@@ -11,9 +11,6 @@ uniform mat4  RotateMatrix;
 uniform mat4  TranslateMatrix;
 uniform mat4  VPMatrix;
 
-const float EUC = 0.0;
-const float SPH = 1.0;
-const float HYP = -1.0;
 uniform float curvature;
 
 uniform Light[8] lights;
@@ -30,45 +27,47 @@ out vec4 wLight[8];		    // light dir in world space
 out vec2 texcoord;
 
 float dotGeom(vec4 u, vec4 v) {
-    float LorentzSign = curvature == HYP ? -1.0 : 1.0;
+    float LorentzSign = curvature < 0.0 ? -1.0 : 1.0;
     return u.x * v.x + u.y * v.y + u.z * v.z + LorentzSign * u.w * v.w;
 }
 
 vec4 direction(vec4 to, vec4 from) {
-    if(curvature == EUC) {
+    if(curvature == 0.0) { //EUCLIDEAN
         return normalize(to - from);
     }
-    if (curvature == SPH) {
+    if (curvature > 0.0) { //SPHERICAL
         float cosd = dotGeom(from, to);
         float sind = sqrt(1 - cosd * cosd);
         return (to - from * cosd)/sind;
     }
-    //HYP
-    float coshd = -dotGeom(from, to);
-    float sinhd = sqrt(coshd * coshd - 1);
-    return (to - from * coshd)/sinhd;
+    if (curvature < 0.0) { //HYPERBOLIC
+        float coshd = -dotGeom(from, to);
+        float sinhd = sqrt(coshd * coshd - 1);
+        return (to - from * coshd)/sinhd;
+    }
     
 }
 
 vec4 transformPointToCurrentSpace(vec4 eucPoint) {
-    if (curvature == EUC) {
+    if (curvature == 0.0) { //EUCLIDEAN
         return eucPoint;
     }
     
     vec3 P = eucPoint.xyz;
     float dist = sqrt(dot(P,P)) + 0.000001;
-    vec4 v = vec4(P/dist, 0);
+    vec4 v = vec4(P/dist, 0.0);
 
-    if (curvature == SPH) {
+    if (curvature > 0.0) { //SPHERICAL
         return vec4(0,0,0,1) * cos(dist) + v * sin(dist);
     }
-    //HYP
-    return vec4(0,0,0,1) * cosh(dist) + v * sinh(dist);
+    if (curvature < 0.0) { //HYPERBOLIC
+        return vec4(0,0,0,1) * cosh(dist) + v * sinh(dist);
+    }
 }
     
 
 vec4 transformVectorToCurrentSpace(vec4 vector, vec4 point) {
-	if (curvature == EUC) return vector;
+	if (curvature == 0.0) return vector;
     float alpha = curvature;
 	float x = point.x;
 	float y = point.y;

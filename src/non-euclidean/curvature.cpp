@@ -6,11 +6,31 @@
 
 float Curvature::curvature = EUC;
 
-void Curvature::setCurvature(float newCurvature) {
-    curvature = newCurvature;
-}
-
 float Curvature::getCurvature()
 {   
     return curvature;
+}
+
+bool Curvature::isHyperbolic() {
+    return curvature < 0.0f;
+}
+
+bool Curvature::isSpherical() {
+    return curvature > 0.0f;
+}
+
+bool Curvature::isEuclidean() {
+    return curvature == 0.0f;
+}
+
+void Curvature::setHyperbolic() {
+    curvature = -1.0f;
+}
+
+void Curvature::setSpherical() {
+    curvature =  1.0f;
+}
+
+void Curvature::setEuclidean() {
+    curvature =  0.0f;
 }
