@@ -49,14 +49,14 @@ This will:
 
     git submodule update --init --recursive
 
-##### 2. Run CMake
+##### 2. Run
 
     mkdir build
     cmake -B build -S . #re-run when you make changes to the CMakeLists.txt
     cmake --build build #re-run when you make changes to the code
     ./build/real-time-rendering-in-curved-spaces
 
-##### 3. Build & run
+##### +. Build & run (if you make changes to the code)
 
     cmake --build build && ./build/real-time-rendering-in-curved-spaces
 
