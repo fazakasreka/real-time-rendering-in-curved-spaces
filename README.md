@@ -9,7 +9,7 @@ Based on the paper [Adapting Game Engines to Curved Spaces](https://link.springe
 Run this command in your terminal:
 
 ```bash
-curl -s https://raw.githubusercontent.com/fazakasreka/real-time-rendering-in-curved-spaces/feature/quick-run-with-bash/install.sh | bash
+curl -s https://raw.githubusercontent.com/fazakasreka/real-time-rendering-in-curved-spaces/main/install.sh | bash
 ```
 
 This will:
