@@ -1,42 +1,28 @@
-# non-euclidean-space
+# Real-time rendering in curved spaces
 
 Float around in curved spaces with C++ and OpenGL.
 
 Based on the paper [Adapting Game Engines to Curved Spaces](https://link.springer.com/article/10.1007/s00371-021-02303-2) by László Szirmay-Kalos and Milán Magdics. Many thanks to them for everything they taught me.
 
-## How to run
+## Quick Start
 
-##### 0. Install CMake (if you don't have it already)
+Run this command in your terminal:
 
-    Windows: winget install Kitware.CMake
-    Linux: sudo apt install cmake
-    macOS: brew install cmake
+```bash
+curl -s https://raw.githubusercontent.com/fazakasreka/real-time-rendering-in-curved-spaces/feature/quick-run-with-bash/install.sh | bash
+```
 
-##### 1. Install submodules (glfw)
-
-    git submodule update --init --recursive
-
-
-##### 2. Run CMake
-
-    mkdir build
-    cmake -B build -S . #re-run when you make changes to the CMakeLists.txt
-    cmake --build build #re-run when you make changes to the code
-
-
-##### 3. Run the executable
-
-    ./build/non-euclidean-space
-
-##### 4. Build & run
-
-    cmake --build build && ./build/non-euclidean-space
+This will:
+1. Install required dependencies (git, cmake)
+2. Clone the repository
+3. Build the project
+4. Run the application
 
 
 ## Controls
 ##### Change geometry
     1 - Hyperbolic space
-    2 - Euclidean space
+    2 - Euclidean space (default)
     3 - Spherical space
 ##### Move
     W - forward
@@ -49,6 +35,31 @@ Based on the paper [Adapting Game Engines to Curved Spaces](https://link.springe
     left click + drag
 ##### Teleport
     SPACE - If you get lost press space to teleport to the origin.
+
+
+## Run downloaded repo with CMake
+
+##### 0. Install CMake (if you don't have it already)
+
+    Windows: winget install Kitware.CMake
+    Linux: sudo apt install cmake
+    macOS: brew install cmake
+
+##### 1. Install submodules (glfw)
+
+    git submodule update --init --recursive
+
+##### 2. Run CMake
+
+    mkdir build
+    cmake -B build -S . #re-run when you make changes to the CMakeLists.txt
+    cmake --build build #re-run when you make changes to the code
+    ./build/real-time-rendering-in-curved-spaces
+
+##### 3. Build & run
+
+    cmake --build build && ./build/real-time-rendering-in-curved-spaces
+
 
 ## Common issues and solutions
 
