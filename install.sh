@@ -62,6 +62,7 @@ mkdir -p build
 cd build
 
 cmake ..
+
 if [[ "$OSTYPE" == "darwin"* ]]; then
     CORES=$(sysctl -n hw.ncpu)
 else
