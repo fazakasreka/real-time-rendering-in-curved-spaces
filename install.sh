@@ -21,6 +21,10 @@ install_package() {
             sudo apt-get install -y "$2"
         elif [[ "$OSTYPE" == "msys" || "$OSTYPE" == "win32" ]]; then
             winget install --id "$3" -e --source winget
+            if [ "$1" == "cmake" ]; then
+                # Refresh PATH for CMake
+                export PATH="$PATH:/c/Program Files/CMake/bin"
+            fi
         fi
     fi
 }
