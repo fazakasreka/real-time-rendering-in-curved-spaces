@@ -6,7 +6,7 @@ Based on the paper [Adapting Game Engines to Curved Spaces](https://link.springe
 
 ## Quick Start
 
-Run this command in your terminal:
+Run this command in your terminal or Git Bash on Windows:
 
 ```bash
 curl -s https://raw.githubusercontent.com/fazakasreka/real-time-rendering-in-curved-spaces/main/install.sh | bash
