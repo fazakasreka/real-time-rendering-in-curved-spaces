@@ -75,4 +75,9 @@ cmake --build . -j$CORES
 # Run
 echo -e "${GREEN}Starting real-time-rendering-in-curved-spaces...${NC}"
 cd ..
-exec ./build/real-time-rendering-in-curved-spaces
+
+if [[ "$OSTYPE" == "msys" || "$OSTYPE" == "win32" ]]; then
+    start build\\real-time-rendering-in-curved-spaces.exe
+else
+    ./build/real-time-rendering-in-curved-spaces
+fi
