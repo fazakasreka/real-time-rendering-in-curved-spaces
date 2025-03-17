@@ -72,4 +72,5 @@ cmake --build . -j$CORES
 
 # Run
 echo -e "${GREEN}Starting real-time-rendering-in-curved-spaces...${NC}"
-exec ./real-time-rendering-in-curved-spaces
+cd ..
+exec ./build/real-time-rendering-in-curved-spaces
