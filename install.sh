@@ -63,7 +63,7 @@ echo -e "${BLUE}Building project...${NC}"
 mkdir -p build
 cd build
 
-cmake ..
+cmake -DCMAKE_BUILD_TYPE=Release ..
 
 if [[ "$OSTYPE" == "darwin"* ]]; then
     CORES=$(sysctl -n hw.ncpu)
@@ -77,7 +77,7 @@ echo -e "${GREEN}Starting real-time-rendering-in-curved-spaces...${NC}"
 cd ..
 
 if [[ "$OSTYPE" == "msys" || "$OSTYPE" == "win32" ]]; then
-    start build\\real-time-rendering-in-curved-spaces.exe
+    start build\\Release\\real-time-rendering-in-curved-spaces.exe
 else
     ./build/real-time-rendering-in-curved-spaces
 fi
