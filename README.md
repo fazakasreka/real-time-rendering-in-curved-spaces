@@ -30,7 +30,7 @@ Based on the paper [Adapting Game Engines to Curved Spaces](https://link.springe
     SPACE - If you get lost press space to teleport to the origin.
 
 
-## Run downloaded repo with CMake
+## Run cloned repo with CMake
 
 ##### 0. Install CMake (if you don't have it already)
 
