@@ -13,10 +13,6 @@ double mouseDeltaX = 0.0;
 double mouseDeltaY = 0.0;
 bool leftMousePressed = false;
 
-// Mouse position
-double mouseX = 0.0;
-double mouseY = 0.0;
-
 // Input handling
 EM_BOOL mouseClickCallback(int eventType, const EmscriptenMouseEvent *e, void *userData) {
     if (eventType == EMSCRIPTEN_EVENT_MOUSEDOWN) {
@@ -26,16 +22,22 @@ EM_BOOL mouseClickCallback(int eventType, const EmscriptenMouseEvent *e, void *u
     } else if (eventType == EMSCRIPTEN_EVENT_MOUSEUP) {
         if (e->button == 0) { // Left button
             leftMousePressed = false;
+            mouseDeltaX = 0.0;
+            mouseDeltaY = 0.0;
         }
     }
     return EM_TRUE;
 }
 
+
 EM_BOOL mouseMoveCallback(int eventType, const EmscriptenMouseEvent *e, void *userData) {
     if (eventType == EMSCRIPTEN_EVENT_MOUSEMOVE) {
         if (leftMousePressed) {
             mouseDeltaX = e->movementX/(float)windowWidth;
-            mouseDeltaY = e->movementY/(float)windowHeight;
+            mouseDeltaY = -(e->movementY/(float)windowHeight);
+        }else{
+            mouseDeltaX = 0.0;
+            mouseDeltaY = 0.0;
         }
     }
 }
@@ -138,6 +140,23 @@ int main() {
     // Build scene
     scene.Build();
     scene.camera.updateAspectRatio(windowWidth, windowHeight);
+
+    // Set the document title using JavaScript
+    emscripten_run_script("document.title = 'Real-Time Rendering in Curved Spaces';");
+
+    // Print controls
+    printf("CONTROL KEYS:\n");
+    printf("[space]: Teleport back to origin\n");
+    printf("\n");
+    printf("[1]: Change to HYPERBOLIC (-1 curvature)\n");
+    printf("[2]: Change to EUCLIDEAN (0 curvature)\n");
+    printf("[3]: Change to SPHERICAL (1 curvature)\n");
+    printf("\n");
+    printf("[W/A/S/D]: Move around\n");
+    printf("[Q/E]: Move up/down\n");
+    printf("\n");
+    printf("MOUSE:\n");
+    printf("move mouse + left click: Rotate camera\n");
 
     // Set the main loop
     emscripten_set_main_loop(main_loop, 0, true);
