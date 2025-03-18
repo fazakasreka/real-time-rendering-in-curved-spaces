@@ -60,7 +60,12 @@ void Texture::create(int width, int height, const std::vector<vec4>& image, int 
     if (textureId == 0) glGenTextures(1, &textureId);      // id generation
     glBindTexture(GL_TEXTURE_2D, textureId);    // binding
 
+#ifdef __EMSCRIPTEN__
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA32F, width, height, 0, GL_RGBA, GL_FLOAT, &image[0]); // To GPU
+#else
     glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RGBA, GL_FLOAT, &image[0]); // To GPU
+#endif
+
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, sampling); // sampling
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, sampling);
 }

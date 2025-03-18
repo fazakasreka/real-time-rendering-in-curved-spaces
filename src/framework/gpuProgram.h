@@ -1,7 +1,12 @@
 #ifndef GPUPROGRAM_H
 #define GPUPROGRAM_H
 
+#ifdef __EMSCRIPTEN__
+#include <GLES3/gl3.h>
+#else
 #include <glad/glad.h>
+#endif
+
 #include <string>
 #include "texture.h"
 
@@ -24,8 +29,7 @@ public:
     unsigned int getId() { return shaderProgramId; }
 
     bool create(const char* const vertexShaderSource,
-                const char* const fragmentShaderSource, 
-                const char* const fragmentShaderOutputName,
+                const char* const fragmentShaderSource,
                 const char* const geometryShaderSource = nullptr);
 
     void Use();

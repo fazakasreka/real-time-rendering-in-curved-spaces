@@ -1,5 +1,4 @@
 #version 330
-precision highp float;
 
 struct Light {
     vec3 La, Le;
@@ -22,7 +21,8 @@ in  vec4 wNormal;       // interpolated world sp normal
 in  vec4 wView;         // interpolated world sp view
 in  vec4 wLight[8];     // interpolated world sp illum dir
 in  vec2 texcoord;
-out vec4 fragmentColor; // output goes to frame buffer
+
+out vec4 fragColor; // output goes to frame buffer
 
 float dotGeom(vec4 u, vec4 v) {
     float LorentzSign = curvature < 0.0 ? -1.0 : 1.0;
@@ -40,9 +40,9 @@ void main() {
     for(int i = 0; i < nLights; i++) {
         vec4 L = normalize(wLight[i]);
         vec4 H = normalize(L + V);
-        float cost = max(dotGeom(N, L), 0), cosd = max(dotGeom(N, H), 0);
+        float cost = max(dotGeom(N, L), 0.0), cosd = max(dotGeom(N, H), 0.0);
         // kd and ka are modulated by the texture
         radiance += ka * lights[i].La + (kd * cost + material.ks * pow(cosd, material.shininess)) * lights[i].Le;
     }
-    fragmentColor = vec4(radiance, 1);
+    fragColor = vec4(radiance, 1);
 }

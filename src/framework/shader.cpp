@@ -41,14 +41,21 @@ void Shader::setUniformMaterial(const Material* material, const std::string& nam
     setUniform(currentMaterial->emission, name + ".emission");
 }
 
-void Shader::createShaderFromFiles(const char* vertPath, const char* fragPath, const char* outputName) {
+void Shader::createShaderFromFiles(const char* vertPath, const char* fragPath) {
     std::string vertString = readFile(vertPath);
     std::string fragString = readFile(fragPath);
-    
+
     if (vertString.empty() || fragString.empty()) {
         std::cerr << "Error: Shader file(s) not found or empty" << std::endl;
         return;
     }
-    
-    create(vertString.c_str(), fragString.c_str(), outputName);
+
+    // Replace the version for webgl
+#ifdef __EMSCRIPTEN__
+    const std::string webglVersion = "#version 300 es\nprecision highp float;\nprecision highp int;\n";
+    vertString.replace(0, vertString.find('\n'), webglVersion);
+    fragString.replace(0, fragString.find('\n'), webglVersion);
+#endif
+
+    create(vertString.c_str(), fragString.c_str());
 }

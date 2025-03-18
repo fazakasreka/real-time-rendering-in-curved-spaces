@@ -28,7 +28,13 @@ bool GPUProgram::checkLinking(unsigned int program) {
 	glGetProgramiv(program, GL_LINK_STATUS, &OK);
 	if (!OK) {
 		printf("Failed to link shader program!\n");
-		getErrorInfo(program);
+		int logLen;
+		glGetProgramiv(program, GL_INFO_LOG_LENGTH, &logLen);
+		if (logLen > 0) {
+			std::string log(logLen, '\0');
+			glGetProgramInfoLog(program, logLen, nullptr, &log[0]);
+			printf("Program log:\n%s", log.c_str());
+		}
 		return false;
 	}
 	return true;
@@ -54,8 +60,7 @@ void GPUProgram::operator=(const GPUProgram& program) {
 }
 
 bool GPUProgram::create(const char* const vertexShaderSource,
-					   const char* const fragmentShaderSource, 
-					   const char* const fragmentShaderOutputName,
+					   const char* const fragmentShaderSource,
 					   const char* const geometryShaderSource) 
 {
 	// Create vertex shader from string
@@ -69,6 +74,13 @@ bool GPUProgram::create(const char* const vertexShaderSource,
 	if (!checkShader(vertexShader, "Vertex shader error")) return false;
 
 	// Create geometry shader from string if given
+#ifdef __EMSCRIPTEN__
+	// GLES2 does not support geometry shaders
+	if (geometryShaderSource != nullptr) {
+		printf("Geometry shaders are not supported in WebGL\n");
+		return false;
+	}
+#else
 	if (geometryShaderSource != nullptr) {
 		if (geometryShader == 0) geometryShader = glCreateShader(GL_GEOMETRY_SHADER);
 		if (!geometryShader) {
@@ -79,6 +91,7 @@ bool GPUProgram::create(const char* const vertexShaderSource,
 		glCompileShader(geometryShader);
 		if (!checkShader(geometryShader, "Geometry shader error")) return false;
 	}
+#endif
 
 	// Create fragment shader from string
 	if (fragmentShader == 0) fragmentShader = glCreateShader(GL_FRAGMENT_SHADER);
@@ -99,10 +112,10 @@ bool GPUProgram::create(const char* const vertexShaderSource,
 	}
 	glAttachShader(shaderProgramId, vertexShader);
 	glAttachShader(shaderProgramId, fragmentShader);
+#ifndef __EMSCRIPTEN__
 	if (geometryShader > 0) glAttachShader(shaderProgramId, geometryShader);
-
-	// Connect the fragmentColor to the frame buffer memory
-	glBindFragDataLocation(shaderProgramId, 0, fragmentShaderOutputName);
+	glBindFragDataLocation(shaderProgramId, 0, "fragColor");
+#endif
 
 	// program packaging
 	glLinkProgram(shaderProgramId);

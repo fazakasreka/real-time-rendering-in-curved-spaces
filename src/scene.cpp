@@ -5,7 +5,7 @@
 class GeomShader : public Shader {
 public:
 	GeomShader() {
-		createShaderFromFiles("src/shaders/geom.vert", "src/shaders/geom.frag", "fragmentColor");
+		createShaderFromFiles("src/shaders/geom.vert", "src/shaders/geom.frag");
 	}
 
 	void Bind(RenderState state) {
