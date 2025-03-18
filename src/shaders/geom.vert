@@ -1,5 +1,4 @@
 #version 330
-precision highp float;
 
 struct Light {
     vec3 La, Le;
@@ -37,12 +36,12 @@ vec4 direction(vec4 to, vec4 from) {
     }
     if (curvature > 0.0) { //SPHERICAL
         float cosd = dotGeom(from, to);
-        float sind = sqrt(1 - cosd * cosd);
+        float sind = sqrt(1.0 - cosd * cosd);
         return (to - from * cosd)/sind;
     }
     if (curvature < 0.0) { //HYPERBOLIC
         float coshd = -dotGeom(from, to);
-        float sinhd = sqrt(coshd * coshd - 1);
+        float sinhd = sqrt(coshd * coshd - 1.0);
         return (to - from * coshd)/sinhd;
     }
     
@@ -58,10 +57,10 @@ vec4 transformPointToCurrentSpace(vec4 eucPoint) {
     vec4 v = vec4(P/dist, 0.0);
 
     if (curvature > 0.0) { //SPHERICAL
-        return vec4(0,0,0,1) * cos(dist) + v * sin(dist);
+        return vec4(0.0,0.0,0.0,1.0) * cos(dist) + v * sin(dist);
     }
     if (curvature < 0.0) { //HYPERBOLIC
-        return vec4(0,0,0,1) * cosh(dist) + v * sinh(dist);
+        return vec4(0.0,0.0,0.0,1.0) * cosh(dist) + v * sinh(dist);
     }
 }
     
@@ -75,9 +74,9 @@ vec4 transformVectorToCurrentSpace(vec4 vector, vec4 point) {
 	float w = point.w;
     //vector * TransformMatrix(point)
 	return vector * mat4(
-		vec4(1 - (alpha * (x*x / (1 + w))),	-(alpha * (x*y / (1 + w))),		-(alpha * (x*z / (1 + w))),	-alpha * x),
-		vec4(-(alpha * (y*x / (1 + w))),		1 - (alpha * (y*y / (1 + w))),	-(alpha * (y*z / (1 + w))),	-alpha * y),
-		vec4(-(alpha * (z*x / (1 + w))),		-(alpha * (z*y / (1 + w))),		1- (alpha * (z*z / (1 + w))),	-alpha * z),
+		vec4(1.0 - (alpha * (x*x / (1.0 + w))),	-(alpha * (x*y / (1.0 + w))),		-(alpha * (x*z / (1.0 + w))),	-alpha * x),
+		vec4(-(alpha * (y*x / (1.0 + w))),		1.0 - (alpha * (y*y / (1.0 + w))),	-(alpha * (y*z / (1.0 + w))),	-alpha * y),
+		vec4(-(alpha * (z*x / (1.0 + w))),		-(alpha * (z*y / (1.0 + w))),		1.0 - (alpha * (z*z / (1.0 + w))),	-alpha * z),
 		vec4(x,								y,								z,							w));
 }
 void main() {
