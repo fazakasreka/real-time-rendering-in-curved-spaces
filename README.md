@@ -4,11 +4,13 @@ Float around in curved spaces with C++ and OpenGL.
 
 Based on the paper [Adapting Game Engines to Curved Spaces](https://link.springer.com/article/10.1007/s00371-021-02303-2) by László Szirmay-Kalos and Milán Magdics. Many thanks to them for everything they taught me.
 
-## Quick Build with Docker
 
-docker build -t real-time-rendering-in-curved-spaces .
-docker run --rm -p 8080:8080 real-time-rendering-in-curved-spaces
-http://localhost:8080/real-time-rendering-in-curved-spaces.html
+
+## Quick Build with Docker
+    docker run --rm -p 8080:8080 fazakasreka/real-time-rendering-in-curved-spaces:latest
+
+#### Go to the url 
+    http://localhost:8080/real-time-rendering-in-curved-spaces.html
 
 ## Controls
 ##### Change geometry
