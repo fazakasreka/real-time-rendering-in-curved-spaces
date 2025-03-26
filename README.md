@@ -1,8 +1,9 @@
 # Real-time rendering in curved spaces
 
-Float around in curved spaces with C++ and OpenGL.
+A C++/OpenGL program, that simulates what a three dimensional curved space would look like. 
+I first developed this as my bachelor's thesis and have since expanded it.
 
-Based on the paper [Adapting Game Engines to Curved Spaces](https://link.springer.com/article/10.1007/s00371-021-02303-2) by László Szirmay-Kalos and Milán Magdics. Many thanks to them for everything they taught me.
+It implements curved spaces as a three dimensional projection of a four dimensional sphere (+1 curvature) or hyperbole (-1 curvature), based on the paper [Adapting Game Engines to Curved Spaces](https://link.springer.com/article/10.1007/s00371-021-02303-2) by László Szirmay-Kalos and Milán Magdics. Many thanks to them for everything they taught me.
 
 ## Quick Run with Docker
 #### Run the docker image
